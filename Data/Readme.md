@@ -6,11 +6,13 @@
 ###Inpatient Charge Data, 2011-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/
+
 __Stats:__
 * 681,215 rows
 * 3,446 hospitals
 * 566 services
 * 27,453,280 discharges (avg. 6,863,320 per year)
+
 __Primary elements:__
 * Hospital identifier, name
 * Hospital location (address, city, state, ZIP)
@@ -23,8 +25,10 @@ __Primary elements:__
 ###Medicare Fee-for-Service Enrollment, 2011-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/CMSProgramStatistics/2013/Enrollment.html#Total (Fee-For-Service and Managed Care) Medicare Enrollment
+
 __Stats:__
 * 1,224 rows
+
 __Primary elements__
 * State
 * Hospital referral region
@@ -34,8 +38,10 @@ __Primary elements__
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Provider-of-Services/index.html
 Note: including 2010 POS file to allow for leading indicators. Hospitals may be responding to market conditions in the prior year to set charges for the current year.
+
 __Stats:__
 * 28,573 rows (avg. 7,143 per year)
+
 __Primary elements__
 * Number of times this provider has undergone a change of ownership
 * Facility is eligible to participate in the Medicare and/or Medicaid programs (1/0).
