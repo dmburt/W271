@@ -1,5 +1,6 @@
 # W271 Final Project
 ##UC Berkeley MIDS W271 (Fall 2016) Final Project
+_Burt, D.M. | Pelkey, S. | Pera, M. | Sanders, J._
 
 
 
