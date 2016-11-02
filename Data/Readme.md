@@ -1,6 +1,5 @@
-<snippet>
-  <content><![CDATA[
-# ${1:W271 Final Project}
+# W271 Final Project
+
 ###What is Driving the Cost of Care? A Study of the Factors Influencing Increasing Hospital Inpatient Charges Over Time
 
 __Medical costs in the United States are rising.__ Between 2011 and 2014, general inflation in the United States slowed from 3.2% to 1.6%, while hospital and related services slowed from 5.6% to 4.6% (U.S. Bureau of Labor Statistics, 2012, 2013, 2014). The increase in cost of medical care has long outpaced the increases in costs of all goods and services in the U.S., and at an estimated $3 trillion in national health expenditures (National Center for Health Statistics, 2016), this difference in inflation is significant. With an aging Baby Boomer population, Medicare spending has doubled as a proportion of total health care expenditure between 1970 and 2014, from 10.1% to 20.2%. In essence, medical cost inflation is higher than general inflation in a population getting increasingly older.
@@ -61,6 +60,3 @@ Primary elements
 2. Loaded original and combined data sets.
              
 
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
