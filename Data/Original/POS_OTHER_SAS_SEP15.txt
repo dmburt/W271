@@ -1,0 +1,971 @@
+/************************************************************************
+*           Job Number: 133573
+*
+*     Procedure Number: 1
+*
+*          Report Name: Automatic POS extract for OTHER for quarter 3, 2015       
+*
+*   Report Description: Automatic POS extract for OTHER for quarter 3,
+*                       2015
+*
+*        Record Length: 1978
+*
+*      Generation Date: Thu Oct 01 16:01:25 EDT 2015 
+*
+*************************************************************************/
+
+INPUT
+
+         @1   PRVDR_CTGRY_SBTYP_CD              $CHAR2.	
+         @3   PRVDR_CTGRY_CD                    $CHAR2.	
+         @5   CHOW_CNT                          2.
+         @7   CHOW_DT                           $CHAR8.	
+        @15   CITY_NAME                         $CHAR28.	
+        @43   ACPTBL_POC_SW                     $CHAR1.	
+        @44   CMPLNC_STUS_CD                    $CHAR1.	
+        @45   SSA_CNTY_CD                       $CHAR3.	
+        @48   CROSS_REF_PROVIDER_NUMBER         $CHAR10.	
+        @58   CRTFCTN_DT                        $CHAR8.	
+        @66   ELGBLTY_SW                        $CHAR1.	
+        @67   FAC_NAME                          $CHAR50.	
+       @117   INTRMDRY_CARR_CD                  $CHAR5.	
+       @122   MDCD_VNDR_NUM                     $CHAR15.	
+       @137   ORGNL_PRTCPTN_DT                  $CHAR8.	
+       @145   CHOW_PRIOR_DT                     $CHAR8.	
+       @153   INTRMDRY_CARR_PRIOR_CD            $CHAR5.	
+       @158   PRVDR_NUM                         $CHAR10.	
+       @168   RGN_CD                            $CHAR2.	
+       @170   SKLTN_REC_SW                      $CHAR1.	
+       @171   STATE_CD                          $CHAR2.	
+       @173   SSA_STATE_CD                      $CHAR2.	
+       @175   STATE_RGN_CD                      $CHAR3.	
+       @178   ST_ADR                            $CHAR50.	
+       @228   PHNE_NUM                          $CHAR10.	
+       @238   PGM_TRMNTN_CD                     $CHAR2.	
+       @240   TRMNTN_EXPRTN_DT                  $CHAR8.	
+       @248   CRTFCTN_ACTN_TYPE_CD              $CHAR1.	
+       @249   GNRL_CNTL_TYPE_CD                 $CHAR2.	
+       @251   ZIP_CD                            $CHAR5.	
+       @256   FIPS_STATE_CD                     $CHAR2.	
+       @258   FIPS_CNTY_CD                      $CHAR3.	
+       @261   CBSA_URBN_RRL_IND                 $CHAR1.	
+       @262   CBSA_CD                           $CHAR5.	
+       @267   ACRDTN_EFCTV_DT                   $CHAR8.	
+       @275   ACRDTN_EXPRTN_DT                  $CHAR8.	
+       @283   ACRDTN_TYPE_CD                    $CHAR1.	
+       @284   TOT_AFLTD_AMBLNC_SRVC_CNT         2.
+       @286   TOT_AFLTD_ASC_CNT                 2.
+       @288   TOT_COLCTD_HOSP_CNT               2.
+       @290   TOT_AFLTD_ESRD_CNT                2.
+       @292   TOT_AFLTD_FQHC_CNT                2.
+       @294   TOT_AFLTD_HHA_CNT                 2.
+       @296   TOT_AFLTD_HOSPC_CNT               2.
+       @298   TOT_AFLTD_OPO_CNT                 2.
+       @300   TOT_AFLTD_PRTF_CNT                2.
+       @302   TOT_AFLTD_RHC_CNT                 2.
+       @304   TOT_AFLTD_SNF_CNT                 2.
+       @306   AFLTD_PRVDR_CNT                   2.
+       @308   RSDNT_PGM_ALPTHC_SW               $CHAR1.	
+       @309   RSDNT_PGM_DNTL_SW                 $CHAR1.	
+       @310   RSDNT_PGM_OSTPTHC_SW              $CHAR1.	
+       @311   RSDNT_PGM_OTHR_SW                 $CHAR1.	
+       @312   RSDNT_PGM_PDTRC_SW                $CHAR1.	
+       @313   LAB_SRVC_CD                       $CHAR1.	
+       @314   PHRMCY_SRVC_CD                    $CHAR1.	
+       @315   RDLGY_SRVC_CD                     $CHAR1.	
+       @316   ASC_BGN_SRVC_DT                   $CHAR8.	
+       @324   FREESTNDNG_ASC_SW                 $CHAR1.	
+       @325   OVRRD_BED_CNT_SW                  $CHAR1.	
+       @326   CRTFD_BED_CNT                     4.
+       @330   ICFIID_BED_CNT                    4.
+       @334   MDCD_NF_BED_CNT                   4.
+       @338   MDCR_SNF_BED_CNT                  4.
+       @342   MDCR_MDCD_SNF_BED_CNT             4.
+       @346   AIDS_BED_CNT                      3.
+       @349   ALZHMR_BED_CNT                    3.
+       @352   DLYS_BED_CNT                      3.
+       @355   DSBL_CHLDRN_BED_CNT               3.
+       @358   HEAD_TRMA_BED_CNT                 3.
+       @361   HOSPC_BED_CNT                     3.
+       @364   HNTGTN_DEASE_BED_CNT              3.
+       @367   REHAB_BED_CNT                     3.
+       @370   VNTLTR_BED_CNT                    3.
+       @373   BED_CNT                           4.
+       @377   BRNCH_CNT                         3.
+       @380   BRNCH_OPRTN_SW                    $CHAR1.	
+       @381   CAH_PSYCH_DPU_SW                  $CHAR1.	
+       @382   CAH_REHAB_DPU_SW                  $CHAR1.	
+       @383   CAH_SB_SW                         $CHAR1.	
+       @384   CRDC_CTHRTZTN_PRCDR_ROOMS_CNT     4.
+       @388   GNRL_FAC_TYPE_CD                  $CHAR2.	
+       @390   CHOW_SW                           $CHAR1.	
+       @391   CLIA_ID_NUMBER_1                  $CHAR10.	
+       @401   CLIA_ID_NUMBER_2                  $CHAR10.	
+       @411   CLIA_ID_NUMBER_3                  $CHAR10.	
+       @421   CLIA_ID_NUMBER_4                  $CHAR10.	
+       @431   CLIA_ID_NUMBER_5                  $CHAR10.	
+       @441   COLCTN_STUS_SW                    $CHAR1.	
+       @442   RN_24_HR_WVR_SW                   $CHAR1.	
+       @443   RN_7_DAY_WVR_SW                   $CHAR1.	
+       @444   BED_PER_ROOM_WVR_SW               $CHAR1.	
+       @445   LSC_WVR_SW                        $CHAR1.	
+       @446   ROOM_SIZE_WVR_SW                  $CHAR1.	
+       @447   ENDSCPY_PRCDR_ROOMS_CNT           4.
+       @451   ESRD_NTWRK_NUM                    $CHAR2.	
+       @453   EXPRMT_RSRCH_CNDCTD_SW            $CHAR1.	
+       @454   FAX_PHNE_NUM                      $CHAR10.	
+       @464   FY_END_MO_DAY_CD                  $CHAR4.	
+       @468   FQHC_APPROVED_RHC_PROVIDER_NUM    $CHAR10.	
+       @478   FED_FUNDD_FQHC_SW                 $CHAR1.	
+       @479   HHA_QLFYD_OPT_SPCH_SW             $CHAR1.	
+       @480   HH_AIDE_TRNG_PGM_CD               $CHAR1.	
+       @481   HOME_TRNG_SPRT_ONLY_SRVC_SW       $CHAR1.	
+       @482   MDCR_HOSPC_SW                     $CHAR1.	
+       @483   HOSP_BSD_SW                       $CHAR1.	
+       @484   INCNTR_NCTRNL_SRVC_SW             $CHAR1.	
+       @485   LTC_CROSS_REF_PROVIDER_NUMBER     $CHAR10.	
+       @495   MDCL_SCHL_AFLTN_CD                $CHAR1.	
+       @496   MEDICARE_HOSPICE_PROVIDER_NUM     $CHAR10.	
+       @506   MDCD_MDCR_PRTCPTG_PRVDR_SW        $CHAR1.	
+       @507   MEDICARE_MEDICAID_PRVDR_NUMBER    $CHAR6.	
+       @513   MLT_FAC_ORG_NAME                  $CHAR38.	
+       @551   MLT_OWND_FAC_ORG_SW               $CHAR1.	
+       @552   MEET_1861_SW                      $CHAR1.	
+       @553   NPP_TYPE_CD                       $CHAR1.	
+       @554   TOT_OFSITE_CNCR_HOSP_CNT          4.
+       @558   TOT_OFSITE_CHLDRN_HOSP_CNT        4.
+       @562   TOT_OFSITE_EMER_DEPT_CNT          4.
+       @566   TOT_OFSITE_INPTNT_LCTN_CNT        4.
+       @570   TOT_OFSITE_LTC_HOSP_CNT           4.
+       @574   TOT_OFSITE_OPTHLMC_SRGRY_CNT      4.
+       @578   TOT_OFSITE_OTHR_LCTN_CNT          4.
+       @582   TOT_OFSITE_PSYCH_HOSP_CNT         4.
+       @586   TOT_OFSITE_PSYCH_UNIT_CNT         4.
+       @590   TOT_OFSITE_REHAB_HOSP_CNT         4.
+       @594   TOT_OFSITE_REHAB_UNIT_CNT         4.
+       @598   TOT_OFSITE_URGNT_CARE_CNTR_CNT    4.
+       @602   OFSITE_LCTN_CNT                   3.
+       @605   OPRTG_ROOM_CNT                    4.
+       @609   ORGNZ_FMLY_MBR_GRP_SW             $CHAR1.	
+       @610   ORGNZ_RSDNT_GRP_SW                $CHAR1.	
+       @611   PARENT_PROVIDER_NUMBER            $CHAR10.	
+       @621   FQHC_APRVD_RHC_SW                 $CHAR1.	
+       @622   MDCR_PRTCPTN_OP_PT_SPCH_SW        $CHAR1.	
+       @623   PGM_PRTCPTN_CD                    $CHAR1.	
+       @624   PRVDR_BSD_FAC_SW                  $CHAR1.	
+       @625   PRVNC_CD                          $CHAR2.	
+       @627   PSYCH_UNIT_BED_CNT                3.
+       @630   PSYCH_UNIT_EFCTV_DT               $CHAR8.	
+       @638   PSYCH_UNIT_SW                     $CHAR1.	
+       @639   PSYCH_UNIT_TRMNTN_CD              $CHAR1.	
+       @640   PSYCH_UNIT_TRMNTN_DT              $CHAR8.	
+       @648   REHAB_UNIT_BED_CNT                3.
+       @651   REHAB_UNIT_EFCTV_DT               $CHAR8.	
+       @659   REHAB_UNIT_SW                     $CHAR1.	
+       @660   REHAB_UNIT_TRMNTN_CD              $CHAR1.	
+       @661   REHAB_UNIT_TRMNTN_DT              $CHAR8.	
+       @669   RELATED_PROVIDER_NUMBER           $CHAR10.	
+       @679   ACUTE_RNL_DLYS_SRVC_CD            $CHAR1.	
+       @680   PSYCH_SRVC_CD                     $CHAR1.	
+       @681   HH_AIDE_SRVC_CD                   $CHAR1.	
+       @682   ALCHL_DRUG_SRVC_CD                $CHAR1.	
+       @683   ANSTHSA_SRVC_CD                   $CHAR1.	
+       @684   APLNC_EQUIP_SRVC_CD               $CHAR1.	
+       @685   AUDLGY_SRVC_CD                    $CHAR1.	
+       @686   BLOOD_SRVC_OFSITE_RSDNT_SW        $CHAR1.	
+       @687   BLOOD_SRVC_ONST_NRSDNT_SW         $CHAR1.	
+       @688   BLOOD_SRVC_ONST_RSDNT_SW          $CHAR1.	
+       @689   BURN_CARE_UNIT_SRVC_CD            $CHAR1.	
+       @690   CRDC_CTHRTZTN_LAB_SRVC_CD         $CHAR1.	
+       @691   OPEN_HRT_SRGRY_SRVC_CD            $CHAR1.	
+       @692   CARF_IP_REHAB_SRVC_CD             $CHAR1.	
+       @693   CHMTHRPY_SRVC_CD                  $CHAR1.	
+       @694   CHRPRCTIC_SRVC_CD                 $CHAR1.	
+       @695   CL_SRVC_OFSITE_RSDNT_SW           $CHAR1.	
+       @696   CL_SRVC_ONST_NRSDNT_SW            $CHAR1.	
+       @697   CL_SRVC_ONST_RSDNT_SW             $CHAR1.	
+       @698   CL_SRVC_CD                        $CHAR1.	
+       @699   CRNRY_CARE_UNIT_SRVC_CD           $CHAR1.	
+       @700   CNSLNG_SRVC_CD                    $CHAR1.	
+       @701   CT_SCAN_SRVC_CD                   $CHAR1.	
+       @702   DNTL_SRVC_CD                      $CHAR1.	
+       @703   DNTL_SRVC_OFSITE_RSDNT_SW         $CHAR1.	
+       @704   DNTL_SRVC_ONST_NRSDNT_SW          $CHAR1.	
+       @705   DNTL_SRVC_ONST_RSDNT_SW           $CHAR1.	
+       @706   SHCK_TRMA_SRVC_CD                 $CHAR1.	
+       @707   DGNSTC_RDLGY_SRVC_CD              $CHAR1.	
+       @708   DTRY_SRVC_CD                      $CHAR1.	
+       @709   DTRY_OFSITE_RSDNT_SW              $CHAR1.	
+       @710   DTRY_ONST_NRSDNT_SW               $CHAR1.	
+       @711   DTRY_ONST_RSDNT_SW                $CHAR1.	
+       @712   DCTD_ER_SRVC_CD                   $CHAR1.	
+       @713   EMER_PSYCH_SRVC_CD                $CHAR1.	
+       @714   XTRCRPRL_SHCK_LTHTRPTR_SRVC_CD    $CHAR1.	
+       @715   FRNSC_PSYCH_SRVC_CD               $CHAR1.	
+       @716   GRTRC_PSYCH_SRVC_CD               $CHAR1.	
+       @717   GRNTLGCL_SPCLTY_SRVC_CD           $CHAR1.	
+       @718   SP_HOME_TRNG_SPRT_HD_SW           $CHAR1.	
+       @719   HMDLYS_SRVC_SW                    $CHAR1.	
+       @720   HMMKR_SRVC_CD                     $CHAR1.	
+       @721   HSEKPNG_SRVC_OFSITE_RSDNT_SW      $CHAR1.	
+       @722   HSEKPNG_SRVC_ONST_NRSDNT_SW       $CHAR1.	
+       @723   HSEKPNG_SRVC_ONST_RSDNT_SW        $CHAR1.	
+       @724   IP_SRGCL_SRVC_CD                  $CHAR1.	
+       @725   INTRN_RSDNT_SRVC_CD               $CHAR1.	
+       @726   MDCL_SCL_SRVC_CD                  $CHAR1.	
+       @727   MDCL_SUPLY_SRVC_CD                $CHAR1.	
+       @728   ICU_SRVC_CD                       $CHAR1.	
+       @729   MDCR_TRNSPLNT_CNTR_SRVC_CD        $CHAR1.	
+       @730   MENTL_HLTH_OFSITE_RSDNT_SW        $CHAR1.	
+       @731   MENTL_HLTH_ONST_NRSDNT_SW         $CHAR1.	
+       @732   MENTL_HLTH_ONST_RSDNT_SW          $CHAR1.	
+       @733   MGNTC_RSNC_IMG_SRVC_CD            $CHAR1.	
+       @734   NEONTL_ICU_SRVC_CD                $CHAR1.	
+       @735   NEONTL_NRSRY_SRVC_CD              $CHAR1.	
+       @736   NRSRGCL_SRVC_CD                   $CHAR1.	
+       @737   ORGN_TRNSPLNT_SRVC_CD             $CHAR1.	
+       @738   NUCLR_MDCN_SRVC_CD                $CHAR1.	
+       @739   NRSNG_SRVC_EMPLEE_SW              $CHAR1.	
+       @740   NRSNG_SRVC_CNTRCTR_SW             $CHAR1.	
+       @741   NRSNG_SRVC_ARNGMT_SW              $CHAR1.	
+       @742   NRSNG_SRVC_CD                     $CHAR1.	
+       @743   NRSNG_SRVC_OFSITE_RSDNT_SW        $CHAR1.	
+       @744   NRSNG_SRVC_ONST_NRSDNT_SW         $CHAR1.	
+       @745   NRSNG_SRVC_ONST_RSDNT_SW          $CHAR1.	
+       @746   NTRTNL_GDNC_SRVC_CD               $CHAR1.	
+       @747   OB_SRVC_CD                        $CHAR1.	
+       @748   OPTHLMC_SRGY_SRVC_CD              $CHAR1.	
+       @749   OPTMTRC_SRVC_CD                   $CHAR1.	
+       @750   OPRTG_ROOM_SRVC_CD                $CHAR1.	
+       @751   ORTHPDC_SRGY_SRVC_CD              $CHAR1.	
+       @752   ORTHTC_PRSTHTC_EMPLEE_SW          $CHAR1.	
+       @753   ORTHTC_PRSTHTC_CNTRCTR_SW         $CHAR1.	
+       @754   ORTHTC_PRSTHTC_ARNGMT_SW          $CHAR1.	
+       @755   OT_EMPLEE_SW                      $CHAR1.	
+       @756   OT_CNTRCTR_SW                     $CHAR1.	
+       @757   OT_ARNGMT_SW                      $CHAR1.	
+       @758   OT_SRVC_CD                        $CHAR1.	
+       @759   OT_SRVC_OFSITE_RSDNT_SW           $CHAR1.	
+       @760   OT_SRVC_ONST_NRSDNT_SW            $CHAR1.	
+       @761   OT_SRVC_ONST_RSDNT_SW             $CHAR1.	
+       @762   OTHR_SRVC_CD                      $CHAR1.	
+       @763   OP_SRVC_CD                        $CHAR1.	
+       @764   OP_PSYCH_SRVC_CD                  $CHAR1.	
+       @765   OP_REHAB_SRVC_CD                  $CHAR1.	
+       @766   OP_SRGRY_UNIT_SRVC_CD             $CHAR1.	
+       @767   PED_SRVC_CD                       $CHAR1.	
+       @768   PED_ICU_SRVC_CD                   $CHAR1.	
+       @769   SP_HOME_TRNG_SPRT_PD_SW           $CHAR1.	
+       @770   PRTNL_DLYS_SRVC_SW                $CHAR1.	
+       @771   PET_SCAN_SRVC_CD                  $CHAR1.	
+       @772   PHRMCY_SRVC_OFSITE_RSDNT_SW       $CHAR1.	
+       @773   PHRMCY_SRVC_ONST_NRSDNT_SW        $CHAR1.	
+       @774   PHRMCY_SRVC_ONST_RSDNT_SW         $CHAR1.	
+       @775   PHYSN_EMPLEE_SW                   $CHAR1.	
+       @776   PHYSN_CNTRCTR_SW                  $CHAR1.	
+       @777   PHYSN_ARNGMT_SW                   $CHAR1.	
+       @778   PHYSN_SRVC_CD                     $CHAR1.	
+       @779   PHYSN_EXT_SRVC_OFSITE_RSDNT_SW    $CHAR1.	
+       @780   PHYSN_EXT_SRVC_ONST_NRSDNT_SW     $CHAR1.	
+       @781   PHYSN_EXT_SRVC_ONST_RSDNT_SW      $CHAR1.	
+       @782   PHYSN_SRVC_OFSITE_RSDNT_SW        $CHAR1.	
+       @783   PHYSN_SRVC_ONST_NRSDNT_SW         $CHAR1.	
+       @784   PHYSN_SRVC_ONST_RSDNT_SW          $CHAR1.	
+       @785   PDTRY_SRVC_OFSITE_RSDNT_SW        $CHAR1.	
+       @786   PDTRY_SRVC_ONST_NRSDNT_SW         $CHAR1.	
+       @787   PDTRY_SRVC_ONST_RSDNT_SW          $CHAR1.	
+       @788   PSTOPRTV_RCVRY_SRVC_CD            $CHAR1.	
+       @789   CHLD_ADLSCNT_PSYCH_SRVC_CD        $CHAR1.	
+       @790   PSYCHLGCL_EMPLEE_SW               $CHAR1.	
+       @791   PSYCHLGCL_CNTRCTR_SW              $CHAR1.	
+       @792   PSYCHLGCL_ARNGMT_SW               $CHAR1.	
+       @793   PT_EMPLEE_SW                      $CHAR1.	
+       @794   PT_CNTRCTR_SW                     $CHAR1.	
+       @795   PT_ARNGMT_SW                      $CHAR1.	
+       @796   PT_SRVC_CD                        $CHAR1.	
+       @797   PT_OFSITE_RSDNT_SW                $CHAR1.	
+       @798   PT_ONST_NRSDNT_SW                 $CHAR1.	
+       @799   PT_ONST_RSDNT_SW                  $CHAR1.	
+       @800   RCNSTRCTN_SRGY_SRVC_CD            $CHAR1.	
+       @801   RSPRTRY_CARE_EMPLEE_SW            $CHAR1.	
+       @802   RSPRTRY_CARE_CNTRCTR_SW           $CHAR1.	
+       @803   RSPRTRY_CARE_ARNGMT_SW            $CHAR1.	
+       @804   RSPRTRY_CARE_SRVC_CD              $CHAR1.	
+       @805   SHRT_TERM_IP_SRVC_CD              $CHAR1.	
+       @806   SCL_EMPLEE_SW                     $CHAR1.	
+       @807   SCL_CNTRCTR_SW                    $CHAR1.	
+       @808   SCL_ARNGMT_SW                     $CHAR1.	
+       @809   SCL_SRVC_CD                       $CHAR1.	
+       @810   SCL_WORK_SRVC_OFSITE_RSDNT_SW     $CHAR1.	
+       @811   SCL_WORK_SRVC_ONST_NRSDNT_SW      $CHAR1.	
+       @812   SCL_WORK_SRVC_ONST_RSDNT_SW       $CHAR1.	
+       @813   SPCH_PTHLGY_EMPLEE_SW             $CHAR1.	
+       @814   SPCH_PTHLGY_CNTRCTR_SW            $CHAR1.	
+       @815   SPCH_PTHLGY_ARNGMT_SW             $CHAR1.	
+       @816   SPCH_PTHLGY_SRVC_CD               $CHAR1.	
+       @817   SPCH_PTHLGY_OFSITE_RSDNT_SW       $CHAR1.	
+       @818   SPCH_PTHLGY_ONST_NRSDNT_SW        $CHAR1.	
+       @819   SPCH_PTHLGY_ONST_RSDNT_SW         $CHAR1.	
+       @820   SPCH_THRPY_SRVC_CD                $CHAR1.	
+       @821   SRGCL_ICU_SRVC_CD                 $CHAR1.	
+       @822   ACTVTY_OTHR_OFSITE_RSDNT_SW       $CHAR1.	
+       @823   ACTVTY_OTHR_ONST_NRSDNT_SW        $CHAR1.	
+       @824   ACTVTY_OTHR_ONST_RSDNT_SW         $CHAR1.	
+       @825   SCL_SRVC_OTHR_OFSITE_RSDNT_SW     $CHAR1.	
+       @826   SCL_SRVC_OTHR_ONST_NRSDNT_SW      $CHAR1.	
+       @827   SCL_SRVC_OTHR_ONST_RSDNT_SW       $CHAR1.	
+       @828   ACTVTY_OFSITE_RSDNT_SW            $CHAR1.	
+       @829   ACTVTY_ONST_NRSDNT_SW             $CHAR1.	
+       @830   ACTVTY_ONST_RSDNT_SW              $CHAR1.	
+       @831   THRPTC_RDLGY_SRVC_CD              $CHAR1.	
+       @832   THRPTC_RCRTNL_OFSITE_RSDNT_SW     $CHAR1.	
+       @833   THRPTC_RCRTNL_ONST_NRSDNT_SW      $CHAR1.	
+       @834   THRPTC_RCRTNL_ONST_RSDNT_SW       $CHAR1.	
+       @835   URGNT_CARE_SRVC_CD                $CHAR1.	
+       @836   VCTNL_GDNC_SRVC_CD                $CHAR1.	
+       @837   VCTNL_SRVC_OFSITE_RSDNT_SW        $CHAR1.	
+       @838   VCTNL_SRVC_ONST_NRSDNT_SW         $CHAR1.	
+       @839   VCTNL_SRVC_ONST_RSDNT_SW          $CHAR1.	
+       @840   DGNSTC_XRAY_OFSITE_RSDNT_SW       $CHAR1.	
+       @841   DGNSTC_XRAY_ONST_NRSDNT_SW        $CHAR1.	
+       @842   DGNSTC_XRAY_ONST_RSDNT_SW         $CHAR1.	
+       @843   ACUTE_RESP_CARE_CD                $CHAR1.	
+       @844   OVRRD_STFG_SW                     $CHAR1.	
+       @845   PROFNL_ADMIN_CNTRCT_CNT           8.2
+       @853   PROFNL_ADMIN_FLTM_CNT             8.2
+       @861   PROFNL_ADMIN_PRTM_CNT             8.2
+       @869   HH_AIDE_EMPLEE_CNT                8.2
+       @877   HH_AIDE_VLNTR_CNT                 8.2
+       @885   PRSNEL_OTHR_CNT                   8.2
+       @893   NRS_AIDE_CNTRCT_CNT               8.2
+       @901   NRS_AIDE_FLTM_CNT                 8.2
+       @909   NRS_AIDE_PRTM_CNT                 8.2
+       @917   CNSLR_EMPLEE_CNT                  8.2
+       @925   CNSLR_VLNTR_CNT                   8.2
+       @933   CRNA_CNT                          8.2
+       @941   DNTST_CNTRCT_CNT                  8.2
+       @949   DNTST_FLTM_CNT                    8.2
+       @957   DNTST_PRTM_CNT                    8.2
+       @965   DIETN_CNT                         8.2
+       @973   DIETN_CNTRCT_CNT                  8.2
+       @981   DIETN_FLTM_CNT                    8.2
+       @989   DIETN_PRTM_CNT                    8.2
+       @997   DRCT_CARE_PRSNEL_CNT              8.2
+      @1005   FOOD_SRVC_CNTRCT_CNT              8.2
+      @1013   FOOD_SRVC_FLTM_CNT                8.2
+      @1021   FOOD_SRVC_PRTM_CNT                8.2
+      @1029   HH_AIDE_CNT                       8.2
+      @1037   HMMKR_EMPLEE_CNT                  8.2
+      @1045   HMMKR_VLNTR_CNT                   8.2
+      @1053   HSEKPNG_CNTRCT_CNT                8.2
+      @1061   HSEKPNG_FLTM_CNT                  8.2
+      @1069   HSEKPNG_PRTM_CNT                  8.2
+      @1077   LAB_TCHNCN_CNT                    8.2
+      @1085   LPN_CNT                           8.2
+      @1093   LPN_LVN_CNT                       8.2
+      @1101   LPN_LVN_CNTRCT_CNT                8.2
+      @1109   LPN_LVN_FLTM_CNT                  8.2
+      @1117   LPN_LVN_PRTM_CNT                  8.2
+      @1125   LPN_LVN_VLNTR_CNT                 8.2
+      @1133   MDCL_DRCTR_CNTRCT_CNT             8.2
+      @1141   MDCL_DRCTR_FLTM_CNT               8.2
+      @1149   MDCL_DRCTR_PRTM_CNT               8.2
+      @1157   MDCL_SCL_WORKR_CNT                8.2
+      @1165   MDCL_SCL_WORKR_VLNTR_CNT          8.2
+      @1173   MDCL_TCHNLGST_CNT                 8.2
+      @1181   MDCTN_AIDE_CNTRCT_CNT             8.2
+      @1189   MDCTN_AIDE_FLTM_CNT               8.2
+      @1197   MDCTN_AIDE_PRTM_CNT               8.2
+      @1205   MENTL_HLTH_SRVC_CNTRCT_CNT        8.2
+      @1213   MENTL_HLTH_SRVC_FLTM_CNT          8.2
+      @1221   MENTL_HLTH_SRVC_PRTM_CNT          8.2
+      @1229   NUCLR_MDCN_TCHNCN_CNT             8.2
+      @1237   NAT_CNTRCT_CNT                    8.2
+      @1245   NAT_FLTM_CNT                      8.2
+      @1253   NAT_PRTM_CNT                      8.2
+      @1261   NRS_PRCTNR_CNT                    8.2
+      @1269   NRS_ADMINV_CNTRCT_CNT             8.2
+      @1277   NRS_ADMINV_FLTM_CNT               8.2
+      @1285   NRS_ADMINV_PRTM_CNT               8.2
+      @1293   OCPTNL_THRPST_CNT                 8.2
+      @1301   OCPTNL_THRPST_CNTRCT_CNT          8.2
+      @1309   OCPTNL_THRPST_FLTM_CNT            8.2
+      @1317   OCPTNL_THRPST_PRTM_CNT            8.2
+      @1325   OT_AIDE_CNTRCT_CNT                8.2
+      @1333   OT_AIDE_FLTM_CNT                  8.2
+      @1341   OT_AIDE_PRTM_CNT                  8.2
+      @1349   OT_ASTNT_CNTRCT_CNT               8.2
+      @1357   OT_ASTNT_FLTM_CNT                 8.2
+      @1365   OT_ASTNT_PRTM_CNT                 8.2
+      @1373   VLNTR_OTHR_CNT                    8.2
+      @1381   ACTVTY_STF_OTHR_CNTRCT_CNT        8.2
+      @1389   ACTVTY_STF_OTHR_FLTM_CNT          8.2
+      @1397   ACTVTY_STF_OTHR_PRTM_CNT          8.2
+      @1405   PHYSN_OTHR_CNTRCT_CNT             8.2
+      @1413   PHYSN_OTHR_FLTM_CNT               8.2
+      @1421   PHYSN_OTHR_PRTM_CNT               8.2
+      @1429   SCL_SRVC_OTHR_STF_CNTRCT_CNT      8.2
+      @1437   SCL_SRVC_OTHR_STF_FLTM_CNT        8.2
+      @1445   SCL_SRVC_OTHR_STF_PRTM_CNT        8.2
+      @1453   STF_OTHR_CNTRCT_CNT               8.2
+      @1461   STF_OTHR_FLTM_CNT                 8.2
+      @1469   STF_OTHR_PRTM_CNT                 8.2
+      @1477   PHRMCST_CNTRCT_CNT                8.2
+      @1485   PHRMCST_FLTM_CNT                  8.2
+      @1493   PHRMCST_PRTM_CNT                  8.2
+      @1501   PHYS_THRPST_CNTRCT_CNT            8.2
+      @1509   PHYS_THRPST_FLTM_CNT              8.2
+      @1517   PHYS_THRPST_PRTM_CNT              8.2
+      @1525   PHYSN_CNT                         8.2
+      @1533   PHYSN_VLNTR_CNT                   8.2
+      @1541   PHYSN_ASTNT_CNT                   8.2
+      @1549   PHYSN_EXT_CNTRCT_CNT              8.2
+      @1557   PHYSN_EXT_FLTM_CNT                8.2
+      @1565   PHYSN_EXT_PRTM_CNT                8.2
+      @1573   RSDNT_PHYSN_CNT                   8.2
+      @1581   PDTRST_CNTRCT_CNT                 8.2
+      @1589   PDTRST_FLTM_CNT                   8.2
+      @1597   PDTRST_PRTM_CNT                   8.2
+      @1605   PSYCHLGST_CNT                     8.2
+      @1613   PHYS_THRPST_STF_CNT               8.2
+      @1621   PHYS_THRPST_CNT                   8.2
+      @1629   PHYS_THRPST_ARNGMT_CNT            8.2
+      @1637   PT_AIDE_CNTRCT_CNT                8.2
+      @1645   PT_AIDE_FLTM_CNT                  8.2
+      @1653   PT_AIDE_PRTM_CNT                  8.2
+      @1661   PT_ASTNT_CNTRCT_CNT               8.2
+      @1669   PT_ASTNT_FLTM_CNT                 8.2
+      @1677   PT_ASTNT_PRTM_CNT                 8.2
+      @1685   ACTVTY_PROFNL_CNTRCT_CNT          8.2
+      @1693   ACTVTY_PROFNL_FLTM_CNT            8.2
+      @1701   ACTVTY_PROFNL_PRTM_CNT            8.2
+      @1709   RDLGY_TCHNCN_CNT                  8.2
+      @1717   REG_PHRMCST_CNT                   8.2
+      @1725   INHLTN_THRPST_CNT                 8.2
+      @1733   RN_CNT                            8.2
+      @1741   RN_CNTRCT_CNT                     8.2
+      @1749   RN_FLTM_CNT                       8.2
+      @1757   RN_PRTM_CNT                       8.2
+      @1765   RN_VLNTR_CNT                      8.2
+      @1773   RN_DRCTR_CNTRCT_CNT               8.2
+      @1781   RN_DRCTR_FLTM_CNT                 8.2
+      @1789   RN_DRCTR_PRTM_CNT                 8.2
+      @1797   SCL_WORKR_CNT                     8.2
+      @1805   SCL_WORKR_CNTRCT_CNT              8.2
+      @1813   SCL_WORKR_FLTM_CNT                8.2
+      @1821   SCL_WORKR_PRTM_CNT                8.2
+      @1829   SPCH_PTHLGST_ARNGMT_CNT           8.2
+      @1837   SPCH_PTHLGST_CNTRCT_CNT           8.2
+      @1845   SPCH_PTHLGST_FLTM_CNT             8.2
+      @1853   SPCH_PTHLGST_PRTM_CNT             8.2
+      @1861   SPCH_PTHLGST_CNT                  8.2
+      @1869   SPCH_PTHLGST_AUDLGST_CNT          8.2
+      @1877   TCHNCL_STF_NUM                    8.2
+      @1885   TCHNCN_CNT                        8.2
+      @1893   THRPTC_RCRTNL_CNTRCT_CNT          8.2
+      @1901   THRPTC_RCRTNL_FLTM_CNT            8.2
+      @1909   THRPTC_RCRTNL_PRTM_CNT            8.2
+      @1917   EMPLEE_CNT                        9.2
+      @1926   VLNTR_CNT                         9.2
+      @1935   SBUNIT_CNT                        3.
+      @1938   SBUNIT_SW                         $CHAR1.	
+      @1939   SBUNIT_OPRTN_SW                   $CHAR1.	
+      @1940   DNTL_SRGRY_SW                     $CHAR1.	
+      @1941   OTLRYNGLGY_SRGRY_SW               $CHAR1.	
+      @1942   ENDSCPY_SRGRY_SW                  $CHAR1.	
+      @1943   OB_GYN_SRGRY_SW                   $CHAR1.	
+      @1944   OPTHMLGY_SRGRY_SW                 $CHAR1.	
+      @1945   ORTHPDC_SRGRY_SW                  $CHAR1.	
+      @1946   OTHR_SRGRY_SW                     $CHAR1.	
+      @1947   PAIN_SRGRY_SW                     $CHAR1.	
+      @1948   PLSTC_SRGRY_SW                    $CHAR1.	
+      @1949   FT_SRGRY_SW                       $CHAR1.	
+      @1950   SB_SW                             $CHAR1.	
+      @1951   SB_SIZE_CD                        $CHAR1.	
+      @1952   TCHNLGST_2_YR_RDLGC_CNT           8.2
+      @1960   TCHNLGST_ASCT_DGR_CNT             8.2
+      @1968   TCHNLGST_BS_BA_DGR_CNT            8.2
+      @1976   DLYS_STN_CNT                      3.
+;
+
+
+
+***************************************************************;
+***                                                            ;
+***   SAS LABEL Statement Follows                              ;
+***                                                            ;
+***************************************************************;
+
+LABEL
+
+      PRVDR_CTGRY_SBTYP_CD              = 'Provider Category Subtype Code'
+      PRVDR_CTGRY_CD                    = 'Provider Category Code'
+      CHOW_CNT                          = 'CHOW Count'
+      CHOW_DT                           = 'CHOW Date'
+      CITY_NAME                         = 'Address: City'
+      ACPTBL_POC_SW                     = 'Compliance: Acceptable POC'
+      CMPLNC_STUS_CD                    = 'Compliance: Status'
+      SSA_CNTY_CD                       = 'SSA County Code'
+      CROSS_REF_PROVIDER_NUMBER         = 'Cross Ref Provider Number'
+      CRTFCTN_DT                        = 'Certification Date'
+      ELGBLTY_SW                        = 'Eligibility Indicator'
+      FAC_NAME                          = 'Facility Name'
+      INTRMDRY_CARR_CD                  = 'Medicare Administrative Contractor (MAC) or Intermediary or Carrier Code'
+      MDCD_VNDR_NUM                     = 'Medicaid Vendor Number'
+      ORGNL_PRTCPTN_DT                  = 'Original Participation Date'
+      CHOW_PRIOR_DT                     = 'Prior CHOW Date'
+      INTRMDRY_CARR_PRIOR_CD            = 'Prior Medicare Administrative Contractor (MAC) or Intermediary or Carrier Code'
+      PRVDR_NUM                         = 'CCN'
+      RGN_CD                            = 'Region Code'
+      SKLTN_REC_SW                      = 'Skeleton Record Indicator'
+      STATE_CD                          = 'State Abbreviation'
+      SSA_STATE_CD                      = 'SSA State Code'
+      STATE_RGN_CD                      = 'State Region Code'
+      ST_ADR                            = 'Address: Street'
+      PHNE_NUM                          = 'Telephone Number'
+      PGM_TRMNTN_CD                     = 'Termination Code'
+      TRMNTN_EXPRTN_DT                  = 'Termination or Expiration Date'
+      CRTFCTN_ACTN_TYPE_CD              = 'Type of Action Code'
+      GNRL_CNTL_TYPE_CD                 = 'Ownership Type Code'
+      ZIP_CD                            = 'Address: ZIP Code'
+      FIPS_STATE_CD                     = 'FIPS State Code'
+      FIPS_CNTY_CD                      = 'FIPS County Code'
+      CBSA_URBN_RRL_IND                 = 'CBSA Urban Rural Indicator'
+      CBSA_CD                           = 'CBSA Code'
+      ACRDTN_EFCTV_DT                   = 'Accreditation Effective Date'
+      ACRDTN_EXPRTN_DT                  = 'Accreditation Expiration Date'
+      ACRDTN_TYPE_CD                    = 'Accreditation Type Code'
+      TOT_AFLTD_AMBLNC_SRVC_CNT         = 'Affiliated Count: Ambulance Services'
+      TOT_AFLTD_ASC_CNT                 = 'Affiliated Count: ASC'
+      TOT_COLCTD_HOSP_CNT               = 'Affiliated Count: Co-Located Hospital'
+      TOT_AFLTD_ESRD_CNT                = 'Affiliated Count: ESRD'
+      TOT_AFLTD_FQHC_CNT                = 'Affiliated Count: FQHC'
+      TOT_AFLTD_HHA_CNT                 = 'Affiliated Count: HHA'
+      TOT_AFLTD_HOSPC_CNT               = 'Affiliated Count: Hospice'
+      TOT_AFLTD_OPO_CNT                 = 'Affiliated Count: OPO'
+      TOT_AFLTD_PRTF_CNT                = 'Affiliated Count: PRTF'
+      TOT_AFLTD_RHC_CNT                 = 'Affiliated Count: RHC'
+      TOT_AFLTD_SNF_CNT                 = 'Affiliated Count: SNF'
+      AFLTD_PRVDR_CNT                   = 'Affiliated Count: Total'
+      RSDNT_PGM_ALPTHC_SW               = 'Affiliated Resident Program: Allopathic'
+      RSDNT_PGM_DNTL_SW                 = 'Affiliated Resident Program: Dental'
+      RSDNT_PGM_OSTPTHC_SW              = 'Affiliated Resident Program: Osteopathic'
+      RSDNT_PGM_OTHR_SW                 = 'Affiliated Resident Program: Other'
+      RSDNT_PGM_PDTRC_SW                = 'Affiliated Resident Program: Podiatric'
+      LAB_SRVC_CD                       = 'Services: Laboratory Code'
+      PHRMCY_SRVC_CD                    = 'Services: Pharmacy Code'
+      RDLGY_SRVC_CD                     = 'Ancillary Services: Radiology Code'
+      ASC_BGN_SRVC_DT                   = 'ASC Begin Service Date'
+      FREESTNDNG_ASC_SW                 = 'ASC Free Standing Indicator'
+      OVRRD_BED_CNT_SW                  = 'Bed Count Override Indicator'
+      CRTFD_BED_CNT                     = 'Bed Count: Certified'
+      ICFIID_BED_CNT                    = 'Bed Count: Certified - Total'
+      MDCD_NF_BED_CNT                   = 'Bed Count: Medicaid NF'
+      MDCR_SNF_BED_CNT                  = 'Bed Count: Medicare SNF'
+      MDCR_MDCD_SNF_BED_CNT             = 'Bed Count: Medicare/Medicaid SNF'
+      AIDS_BED_CNT                      = 'Bed Count: Special Care - AIDS'
+      ALZHMR_BED_CNT                    = 'Bed Count: Special Care - Alzheimers'
+      DLYS_BED_CNT                      = 'Bed Count: Special Care - Dialysis'
+      DSBL_CHLDRN_BED_CNT               = 'Bed Count: Special Care - Disabled Children'
+      HEAD_TRMA_BED_CNT                 = 'Bed Count: Special Care - Head Trauma'
+      HOSPC_BED_CNT                     = 'Bed Count: Special Care - Hospice'
+      HNTGTN_DEASE_BED_CNT              = 'Bed Count: Special Care - Huntingtons Disease'
+      REHAB_BED_CNT                     = 'Bed Count: Special Care - Specialized Rehab'
+      VNTLTR_BED_CNT                    = 'Bed Count: Special Care - Ventilator'
+      BED_CNT                           = 'Bed Count: Total'
+      BRNCH_CNT                         = 'Branch Count'
+      BRNCH_OPRTN_SW                    = 'Branch Operation Indicator'
+      CAH_PSYCH_DPU_SW                  = 'CAH Psychiatric DPU Indicator'
+      CAH_REHAB_DPU_SW                  = 'CAH Rehabilitation DPU Indicator'
+      CAH_SB_SW                         = 'CAH Swing Bed Indicator'
+      CRDC_CTHRTZTN_PRCDR_ROOMS_CNT     = 'Cardiac Catheterization Procedure Room Count'
+      GNRL_FAC_TYPE_CD                  = 'Category-specific Facility Type Code'
+      CHOW_SW                           = 'CHOW Indicator'
+      CLIA_ID_NUMBER_1                  = 'CLIA ID Number 1'
+      CLIA_ID_NUMBER_2                  = 'CLIA ID Number 2'
+      CLIA_ID_NUMBER_3                  = 'CLIA ID Number 3'
+      CLIA_ID_NUMBER_4                  = 'CLIA ID Number 4'
+      CLIA_ID_NUMBER_5                  = 'CLIA ID Number 5'
+      COLCTN_STUS_SW                    = 'Co-Location Indicator'
+      RN_24_HR_WVR_SW                   = 'Compliance: 24-Hour RN Waiver Indicator'
+      RN_7_DAY_WVR_SW                   = 'Compliance: 7-Day RN Waiver Indicator'
+      BED_PER_ROOM_WVR_SW               = 'Compliance: Beds Per Room Waiver Indicator'
+      LSC_WVR_SW                        = 'Compliance: LSC Waiver Indicator'
+      ROOM_SIZE_WVR_SW                  = 'Compliance: Patient Room Size Waiver Indicator'
+      ENDSCPY_PRCDR_ROOMS_CNT           = 'Endoscopy Procedure Room Count'
+      ESRD_NTWRK_NUM                    = 'ESRD Network Number'
+      EXPRMT_RSRCH_CNDCTD_SW            = 'Experimental Research Conducted Indicator'
+      FAX_PHNE_NUM                      = 'Fax Phone Number'
+      FY_END_MO_DAY_CD                  = 'Fiscal Year End Date (MMDD)'
+      FQHC_APPROVED_RHC_PROVIDER_NUM    = 'FQHC Approved RHC Provider Num'
+      FED_FUNDD_FQHC_SW                 = 'FQHC Federally Funded Indicator'
+      HHA_QLFYD_OPT_SPCH_SW             = 'HHA Qualified For OPT Indicator'
+      HH_AIDE_TRNG_PGM_CD               = 'Home Health Aide Training Program Code'
+      HOME_TRNG_SPRT_ONLY_SRVC_SW       = 'Home Training & Support Services Only HD & PD Indicator'
+      MDCR_HOSPC_SW                     = 'Hospice Indicator'
+      HOSP_BSD_SW                       = 'Hospital Based Indicator'
+      INCNTR_NCTRNL_SRVC_SW             = 'In-Center Nocturnal Hemodialysis Services Indicator'
+      LTC_CROSS_REF_PROVIDER_NUMBER     = 'LTC Cross Ref Provider Number'
+      MDCL_SCHL_AFLTN_CD                = 'Medical School Affiliation Code'
+      MEDICARE_HOSPICE_PROVIDER_NUM     = 'Medicare Hospice Provider Num'
+      MDCD_MDCR_PRTCPTG_PRVDR_SW        = 'Medicare or Medicaid Participating Provider Indicator'
+      MEDICARE_MEDICAID_PRVDR_NUMBER    = 'Medicare Medicaid Prvdr Number'
+      MLT_FAC_ORG_NAME                  = 'Multiple Facility Organization Name'
+      MLT_OWND_FAC_ORG_SW               = 'Multiple Facility Organization Owned Indicator'
+      MEET_1861_SW                      = 'Non-Participating Hospital Meets 1861(e) Indicator'
+      NPP_TYPE_CD                       = 'Non-Participating Hospital Type Code'
+      TOT_OFSITE_CNCR_HOSP_CNT          = 'Off-Site Count: Cancer Hospital Satellites'
+      TOT_OFSITE_CHLDRN_HOSP_CNT        = 'Off-Site Count: Childrens Hospital Satellites'
+      TOT_OFSITE_EMER_DEPT_CNT          = 'Off-Site Count: Emergency Departments'
+      TOT_OFSITE_INPTNT_LCTN_CNT        = 'Off-Site Count: Inpatient Remote Locations'
+      TOT_OFSITE_LTC_HOSP_CNT           = 'Off-Site Count: LTC Hospital Satellites'
+      TOT_OFSITE_OPTHLMC_SRGRY_CNT      = 'Off-Site Count: Ophthalmic Surgery Units'
+      TOT_OFSITE_OTHR_LCTN_CNT          = 'Off-Site Count: Other Locations'
+      TOT_OFSITE_PSYCH_HOSP_CNT         = 'Off-Site Count: Psychiatric Hospitals'
+      TOT_OFSITE_PSYCH_UNIT_CNT         = 'Off-Site Count: Psychiatric Units'
+      TOT_OFSITE_REHAB_HOSP_CNT         = 'Off-Site Count: Rehabilitation Hospitals'
+      TOT_OFSITE_REHAB_UNIT_CNT         = 'Off-Site Count: Rehabilitation Units'
+      TOT_OFSITE_URGNT_CARE_CNTR_CNT    = 'Off-Site Count: Urgent Care Centers'
+      OFSITE_LCTN_CNT                   = 'Off-Site Location Count'
+      OPRTG_ROOM_CNT                    = 'Operating Room Count'
+      ORGNZ_FMLY_MBR_GRP_SW             = 'Organized Family Group Indicator'
+      ORGNZ_RSDNT_GRP_SW                = 'Organized Resident Group Indicator'
+      PARENT_PROVIDER_NUMBER            = 'Parent Provider Number'
+      FQHC_APRVD_RHC_SW                 = 'Part of RHC Indicator'
+      MDCR_PRTCPTN_OP_PT_SPCH_SW        = 'Participation Medicare OPT/SP Indicator'
+      PGM_PRTCPTN_CD                    = 'Program Participation Code'
+      PRVDR_BSD_FAC_SW                  = 'Provider Based Facility Indicator'
+      PRVNC_CD                          = 'Province Code'
+      PSYCH_UNIT_BED_CNT                = 'Psychiatric Unit Bed Count'
+      PSYCH_UNIT_EFCTV_DT               = 'Psychiatric Unit Effective Date'
+      PSYCH_UNIT_SW                     = 'Psychiatric Unit Indicator'
+      PSYCH_UNIT_TRMNTN_CD              = 'Psychiatric Unit Termination Code'
+      PSYCH_UNIT_TRMNTN_DT              = 'Psychiatric Unit Termination Date'
+      REHAB_UNIT_BED_CNT                = 'Rehabilitation Unit Bed Count'
+      REHAB_UNIT_EFCTV_DT               = 'Rehabilitation Unit Effective Date'
+      REHAB_UNIT_SW                     = 'Rehabilitation Unit Indicator'
+      REHAB_UNIT_TRMNTN_CD              = 'Rehabilitation Unit Termination Code'
+      REHAB_UNIT_TRMNTN_DT              = 'Rehabilitation Unit Termination Date'
+      RELATED_PROVIDER_NUMBER           = 'Related Provider Number'
+      ACUTE_RNL_DLYS_SRVC_CD            = 'Services: Acute Renal Dialysis Code'
+      PSYCH_SRVC_CD                     = 'Services: Adult Inpatient Psychiatric Code'
+      HH_AIDE_SRVC_CD                   = 'Services: Home Health Aide Code'
+      ALCHL_DRUG_SRVC_CD                = 'Services: Alcohol and/or Drug Code'
+      ANSTHSA_SRVC_CD                   = 'Services: Anesthesia Code'
+      APLNC_EQUIP_SRVC_CD               = 'Services: Appliance and Equipment Code'
+      AUDLGY_SRVC_CD                    = 'Services: Audiology Code'
+      BLOOD_SRVC_OFSITE_RSDNT_SW        = 'Services: Blood Administration Off-Site Residents Indicator'
+      BLOOD_SRVC_ONST_NRSDNT_SW         = 'Services: Blood Administration On-Site Nonresidents Indicator'
+      BLOOD_SRVC_ONST_RSDNT_SW          = 'Services: Blood Administration On-Site Residents Indicator'
+      BURN_CARE_UNIT_SRVC_CD            = 'Services: Burn Care Unit Code'
+      CRDC_CTHRTZTN_LAB_SRVC_CD         = 'Services: Cardiac Catheterization Lab Code'
+      OPEN_HRT_SRGRY_SRVC_CD            = 'Services: Cardiac Thoracic Surgery Code'
+      CARF_IP_REHAB_SRVC_CD             = 'Services: CARF Inpatient Rehabilitation Code'
+      CHMTHRPY_SRVC_CD                  = 'Services: Chemotherapy Code'
+      CHRPRCTIC_SRVC_CD                 = 'Services: Chiropractic Code'
+      CL_SRVC_OFSITE_RSDNT_SW           = 'Services: Clinical Laboratory - Off-Site Residents Indicator'
+      CL_SRVC_ONST_NRSDNT_SW            = 'Services: Clinical Laboratory - On-Site Nonresidents Indicator'
+      CL_SRVC_ONST_RSDNT_SW             = 'Services: Clinical Laboratory - On-Site Residents Indicator'
+      CL_SRVC_CD                        = 'Services: Clinical Laboratory Code'
+      CRNRY_CARE_UNIT_SRVC_CD           = 'Services: Coronary Care Unit Code'
+      CNSLNG_SRVC_CD                    = 'Services: Counseling Code'
+      CT_SCAN_SRVC_CD                   = 'Services: CT Scan Code'
+      DNTL_SRVC_CD                      = 'Services: Dental Code'
+      DNTL_SRVC_OFSITE_RSDNT_SW         = 'Services: Dental Off-Site Residents Indicator'
+      DNTL_SRVC_ONST_NRSDNT_SW          = 'Services: Dental On-Site Nonresidents Indicator'
+      DNTL_SRVC_ONST_RSDNT_SW           = 'Services: Dental On-Site Residents Indicator'
+      SHCK_TRMA_SRVC_CD                 = 'Services: Designated Trauma Center Code'
+      DGNSTC_RDLGY_SRVC_CD              = 'Services: Diagnostic Radiology Code'
+      DTRY_SRVC_CD                      = 'Services: Dietary Code'
+      DTRY_OFSITE_RSDNT_SW              = 'Services: Dietary Off-Site Residents Indicator'
+      DTRY_ONST_NRSDNT_SW               = 'Services: Dietary On-Site Nonresidents Indicator'
+      DTRY_ONST_RSDNT_SW                = 'Services: Dietary On-Site Residents Indicator'
+      DCTD_ER_SRVC_CD                   = 'Services: Emergency Department Code'
+      EMER_PSYCH_SRVC_CD                = 'Services: Emergency Psychiatric Code'
+      XTRCRPRL_SHCK_LTHTRPTR_SRVC_CD    = 'Services: ESWL Code'
+      FRNSC_PSYCH_SRVC_CD               = 'Services: Forensic Psychiatric Code'
+      GRTRC_PSYCH_SRVC_CD               = 'Services: Geriatric Psychiatric Code'
+      GRNTLGCL_SPCLTY_SRVC_CD           = 'Services: Gerontological Specialty Code'
+      SP_HOME_TRNG_SPRT_HD_SW           = 'Services: Hemodialysis Home Training/Support Indicator'
+      HMDLYS_SRVC_SW                    = 'Services: Hemodialysis Indicator'
+      HMMKR_SRVC_CD                     = 'Services: Homemaker Code'
+      HSEKPNG_SRVC_OFSITE_RSDNT_SW      = 'Services: Housekeeping Off-Site Residents Indicator'
+      HSEKPNG_SRVC_ONST_NRSDNT_SW       = 'Services: Housekeeping On-Site Nonresidents Indicator'
+      HSEKPNG_SRVC_ONST_RSDNT_SW        = 'Services: Housekeeping On-Site Residents Indicator'
+      IP_SRGCL_SRVC_CD                  = 'Services: Inpatient Surgical Code'
+      INTRN_RSDNT_SRVC_CD               = 'Services: Interns and Residents Code'
+      MDCL_SCL_SRVC_CD                  = 'Services: Medical Social Code'
+      MDCL_SUPLY_SRVC_CD                = 'Services: Medical Supplies Code'
+      ICU_SRVC_CD                       = 'Services: Medical Surgical ICU Code'
+      MDCR_TRNSPLNT_CNTR_SRVC_CD        = 'Services: Medicare Certified Transplant Center Code'
+      MENTL_HLTH_OFSITE_RSDNT_SW        = 'Services: Mental Health Off-Site Residents Indicator'
+      MENTL_HLTH_ONST_NRSDNT_SW         = 'Services: Mental Health On-Site Nonresidents Indicator'
+      MENTL_HLTH_ONST_RSDNT_SW          = 'Services: Mental Health On-Site Residents Indicator'
+      MGNTC_RSNC_IMG_SRVC_CD            = 'Services: MRI Code'
+      NEONTL_ICU_SRVC_CD                = 'Services: Neonatal ICU Code'
+      NEONTL_NRSRY_SRVC_CD              = 'Services: Neonatal Nursery Code'
+      NRSRGCL_SRVC_CD                   = 'Services: Neurosurgical Code'
+      ORGN_TRNSPLNT_SRVC_CD             = 'Services: Non-Medicare Organ Transplant Code'
+      NUCLR_MDCN_SRVC_CD                = 'Services: Nuclear Medicine Code'
+      NRSNG_SRVC_EMPLEE_SW              = 'Services: Nursing - Employee Indicator'
+      NRSNG_SRVC_CNTRCTR_SW             = 'Services: Nursing - Independent Contractor Indicator'
+      NRSNG_SRVC_ARNGMT_SW              = 'Services: Nursing - Under Arrangement Indicator'
+      NRSNG_SRVC_CD                     = 'Services: Nursing Code'
+      NRSNG_SRVC_OFSITE_RSDNT_SW        = 'Services: Nursing Off-Site Residents Indicator'
+      NRSNG_SRVC_ONST_NRSDNT_SW         = 'Services: Nursing On-Site Nonresidents Indicator'
+      NRSNG_SRVC_ONST_RSDNT_SW          = 'Services: Nursing On-Site Residents Indicator'
+      NTRTNL_GDNC_SRVC_CD               = 'Services: Nutritional Guidance Code'
+      OB_SRVC_CD                        = 'Services: Obstetrics Code'
+      OPTHLMC_SRGY_SRVC_CD              = 'Services: Ophthalmic Surgery Code'
+      OPTMTRC_SRVC_CD                   = 'Services: Optometric Code'
+      OPRTG_ROOM_SRVC_CD                = 'Services: OR Code'
+      ORTHPDC_SRGY_SRVC_CD              = 'Services: Orthopedic Surgery Code'
+      ORTHTC_PRSTHTC_EMPLEE_SW          = 'Services: Orthotic / Prosthetic - Employee Indicator'
+      ORTHTC_PRSTHTC_CNTRCTR_SW         = 'Services: Orthotic / Prosthetic - Independent Contractor Indicator'
+      ORTHTC_PRSTHTC_ARNGMT_SW          = 'Services: Orthotic / Prosthetic - Under Arrangement Indicator'
+      OT_EMPLEE_SW                      = 'Services: OT - Employee Indicator'
+      OT_CNTRCTR_SW                     = 'Services: OT - Independent Contractor Indicator'
+      OT_ARNGMT_SW                      = 'Services: OT - Under Arrangement Indicator'
+      OT_SRVC_CD                        = 'Services: OT Code'
+      OT_SRVC_OFSITE_RSDNT_SW           = 'Services: OT Off-Site Residents Indicator'
+      OT_SRVC_ONST_NRSDNT_SW            = 'Services: OT On-Site Nonresidents Indicator'
+      OT_SRVC_ONST_RSDNT_SW             = 'Services: OT On-Site Residents Indicator'
+      OTHR_SRVC_CD                      = 'Services: Other Code'
+      OP_SRVC_CD                        = 'Services: Outpatient Code'
+      OP_PSYCH_SRVC_CD                  = 'Services: Outpatient Psychiatric Code'
+      OP_REHAB_SRVC_CD                  = 'Services: Outpatient Rehabilitation Code'
+      OP_SRGRY_UNIT_SRVC_CD             = 'Services: Outpatient Surgery Code'
+      PED_SRVC_CD                       = 'Services: Pediatric Code'
+      PED_ICU_SRVC_CD                   = 'Services: Pediatric ICU Code'
+      SP_HOME_TRNG_SPRT_PD_SW           = 'Services: Peritoneal Dialysis Home Training/Support Indicator'
+      PRTNL_DLYS_SRVC_SW                = 'Services: Peritoneal Dialysis Indicator'
+      PET_SCAN_SRVC_CD                  = 'Services: PET Scan Code'
+      PHRMCY_SRVC_OFSITE_RSDNT_SW       = 'Services: Pharmacy Off-Site Residents Indicator'
+      PHRMCY_SRVC_ONST_NRSDNT_SW        = 'Services: Pharmacy On-Site Nonresidents Indicator'
+      PHRMCY_SRVC_ONST_RSDNT_SW         = 'Services: Pharmacy On-Site Residents Indicator'
+      PHYSN_EMPLEE_SW                   = 'Services: Physician - Employee Indicator'
+      PHYSN_CNTRCTR_SW                  = 'Services: Physician - Independent Contractor Indicator'
+      PHYSN_ARNGMT_SW                   = 'Services: Physician - Under Arrangement Indicator'
+      PHYSN_SRVC_CD                     = 'Services: Physician Code'
+      PHYSN_EXT_SRVC_OFSITE_RSDNT_SW    = 'Services: Physician Extender Off-Site Residents Indicator'
+      PHYSN_EXT_SRVC_ONST_NRSDNT_SW     = 'Services: Physician Extender On-Site Nonresidents Indicator'
+      PHYSN_EXT_SRVC_ONST_RSDNT_SW      = 'Services: Physician Extender On-Site Residents Indicator'
+      PHYSN_SRVC_OFSITE_RSDNT_SW        = 'Services: Physician Off-Site Residents Indicator'
+      PHYSN_SRVC_ONST_NRSDNT_SW         = 'Services: Physician On-Site Nonresidents Indicator'
+      PHYSN_SRVC_ONST_RSDNT_SW          = 'Services: Physician On-Site Residents Indicator'
+      PDTRY_SRVC_OFSITE_RSDNT_SW        = 'Services: Podiatry Off-Site Residents Indicator'
+      PDTRY_SRVC_ONST_NRSDNT_SW         = 'Services: Podiatry On-Site Nonresidents Indicator'
+      PDTRY_SRVC_ONST_RSDNT_SW          = 'Services: Podiatry On-Site Residents Indicator'
+      PSTOPRTV_RCVRY_SRVC_CD            = 'Services: Postoperative Recovery Room Code'
+      CHLD_ADLSCNT_PSYCH_SRVC_CD        = 'Services: Psychiatric Child and/or Adolescent Code'
+      PSYCHLGCL_EMPLEE_SW               = 'Services: Psychological - Employee Indicator'
+      PSYCHLGCL_CNTRCTR_SW              = 'Services: Psychological - Independent Contractor Indicator'
+      PSYCHLGCL_ARNGMT_SW               = 'Services: Psychological - Under Arrangement Indicator'
+      PT_EMPLEE_SW                      = 'Services: PT - Employee Indicator'
+      PT_CNTRCTR_SW                     = 'Services: PT - Independent Contractor Indicator'
+      PT_ARNGMT_SW                      = 'Services: PT - Under Arrangement Indicator'
+      PT_SRVC_CD                        = 'Services: PT Code'
+      PT_OFSITE_RSDNT_SW                = 'Services: PT Off-Site Residents Indicator'
+      PT_ONST_NRSDNT_SW                 = 'Services: PT On-Site Nonresidents Indicator'
+      PT_ONST_RSDNT_SW                  = 'Services: PT On-Site Residents Indicator'
+      RCNSTRCTN_SRGY_SRVC_CD            = 'Services: Reconstructive Surgery Code'
+      RSPRTRY_CARE_EMPLEE_SW            = 'Services: Respiratory Care - Employee Indicator'
+      RSPRTRY_CARE_CNTRCTR_SW           = 'Services: Respiratory Care - Independent Contractor Indicator'
+      RSPRTRY_CARE_ARNGMT_SW            = 'Services: Respiratory Care - Under Arrangement Indicator'
+      RSPRTRY_CARE_SRVC_CD              = 'Services: Respiratory Care Code'
+      SHRT_TERM_IP_SRVC_CD              = 'Services: Short Term Inpatient Care Code'
+      SCL_EMPLEE_SW                     = 'Services: Social - Employee Indicator'
+      SCL_CNTRCTR_SW                    = 'Services: Social - Independent Contractor Indicator'
+      SCL_ARNGMT_SW                     = 'Services: Social - Under Arrangement Indicator'
+      SCL_SRVC_CD                       = 'Services: Social Code'
+      SCL_WORK_SRVC_OFSITE_RSDNT_SW     = 'Services: Social Work Off-Site Residents Indicator'
+      SCL_WORK_SRVC_ONST_NRSDNT_SW      = 'Services: Social Work On-Site Nonresidents Indicator'
+      SCL_WORK_SRVC_ONST_RSDNT_SW       = 'Services: Social Work On-Site Residents Indicator'
+      SPCH_PTHLGY_EMPLEE_SW             = 'Services: Speech Pathology - Employee Indicator'
+      SPCH_PTHLGY_CNTRCTR_SW            = 'Services: Speech Pathology - Independent Contractor Indicator'
+      SPCH_PTHLGY_ARNGMT_SW             = 'Services: Speech Pathology - Under Arrangement Indicator'
+      SPCH_PTHLGY_SRVC_CD               = 'Services: Speech Pathology Code'
+      SPCH_PTHLGY_OFSITE_RSDNT_SW       = 'Services: Speech Pathology Off-Site Residents Indicator'
+      SPCH_PTHLGY_ONST_NRSDNT_SW        = 'Services: Speech Pathology On-Site Nonresidents Indicator'
+      SPCH_PTHLGY_ONST_RSDNT_SW         = 'Services: Speech Pathology On-Site Residents Indicator'
+      SPCH_THRPY_SRVC_CD                = 'Services: Speech Therapy Code'
+      SRGCL_ICU_SRVC_CD                 = 'Services: Surgical ICU Code'
+      ACTVTY_OTHR_OFSITE_RSDNT_SW       = 'Services: Therapeutic - Other Activities Staff - Off-Site Residents Indicator'
+      ACTVTY_OTHR_ONST_NRSDNT_SW        = 'Services: Therapeutic - Other Activities Staff - On-Site Nonresidents Indicator'
+      ACTVTY_OTHR_ONST_RSDNT_SW         = 'Services: Therapeutic - Other Activities Staff - On-Site Residents Indicator'
+      SCL_SRVC_OTHR_OFSITE_RSDNT_SW     = 'Services: Therapeutic - Other Social Services Staff - Off-Site Residents Indicator'
+      SCL_SRVC_OTHR_ONST_NRSDNT_SW      = 'Services: Therapeutic - Other Social Services Staff - On-Site Nonresidents Indicator'
+      SCL_SRVC_OTHR_ONST_RSDNT_SW       = 'Services: Therapeutic - Other Social Services Staff - On-Site Residents Indicator'
+      ACTVTY_OFSITE_RSDNT_SW            = 'Services: Therapeutic - Qualified Activities Professional - Off-Site Residents Indicator'
+      ACTVTY_ONST_NRSDNT_SW             = 'Services: Therapeutic - Qualified Activities Professional - On-Site Nonresidents Indicator'
+      ACTVTY_ONST_RSDNT_SW              = 'Services: Therapeutic - Qualified Activities Professional - On-Site Residents Indicator'
+      THRPTC_RDLGY_SRVC_CD              = 'Services: Therapeutic Radiology Code'
+      THRPTC_RCRTNL_OFSITE_RSDNT_SW     = 'Services: Therapeutic Recreational Specialty Off-Site Residents Indicator'
+      THRPTC_RCRTNL_ONST_NRSDNT_SW      = 'Services: Therapeutic Recreational Specialty On-Site Nonresidents Indicator'
+      THRPTC_RCRTNL_ONST_RSDNT_SW       = 'Services: Therapeutic Recreational Specialty On-Site Residents Indicator'
+      URGNT_CARE_SRVC_CD                = 'Services: Urgent Care Center Code'
+      VCTNL_GDNC_SRVC_CD                = 'Services: Vocational Guidance Code'
+      VCTNL_SRVC_OFSITE_RSDNT_SW        = 'Services: Vocational Off-Site Residents Indicator'
+      VCTNL_SRVC_ONST_NRSDNT_SW         = 'Services: Vocational On-Site Nonresidents Indicator'
+      VCTNL_SRVC_ONST_RSDNT_SW          = 'Services: Vocational On-Site Residents Indicator'
+      DGNSTC_XRAY_OFSITE_RSDNT_SW       = 'Services: X-ray Off-Site Residents Indicator'
+      DGNSTC_XRAY_ONST_NRSDNT_SW        = 'Services: X-ray On-Site Nonresidents Indicator'
+      DGNSTC_XRAY_ONST_RSDNT_SW         = 'Services: X-ray On-Site Residents Indicator'
+      ACUTE_RESP_CARE_CD                = 'Short Term Inpatient Acute/Respite Care Code'
+      OVRRD_STFG_SW                     = 'Staff Count Override Indicator'
+      PROFNL_ADMIN_CNTRCT_CNT           = 'Staff Count: Administrative Staff - Contract'
+      PROFNL_ADMIN_FLTM_CNT             = 'Staff Count: Administrative Staff - Full-Time'
+      PROFNL_ADMIN_PRTM_CNT             = 'Staff Count: Administrative Staff - Part-Time'
+      HH_AIDE_EMPLEE_CNT                = 'Staff Count: Aide - Employee'
+      HH_AIDE_VLNTR_CNT                 = 'Staff Count: Aide - Volunteer'
+      PRSNEL_OTHR_CNT                   = 'Staff Count: Other Personnel'
+      NRS_AIDE_CNTRCT_CNT               = 'Staff Count: Certified Nurse Aide - Contract'
+      NRS_AIDE_FLTM_CNT                 = 'Staff Count: Certified Nurse Aide - Full-Time'
+      NRS_AIDE_PRTM_CNT                 = 'Staff Count: Certified Nurse Aide - Part-Time'
+      CNSLR_EMPLEE_CNT                  = 'Staff Count: Counselor - Employee'
+      CNSLR_VLNTR_CNT                   = 'Staff Count: Counselor - Volunteer'
+      CRNA_CNT                          = 'Staff Count: CRNA'
+      DNTST_CNTRCT_CNT                  = 'Staff Count: Dentist - Contract'
+      DNTST_FLTM_CNT                    = 'Staff Count: Dentist - Full-Time'
+      DNTST_PRTM_CNT                    = 'Staff Count: Dentist - Part-Time'
+      DIETN_CNT                         = 'Staff Count: Dietitian'
+      DIETN_CNTRCT_CNT                  = 'Staff Count: Dietitian - Contract'
+      DIETN_FLTM_CNT                    = 'Staff Count: Dietitian - Full-Time'
+      DIETN_PRTM_CNT                    = 'Staff Count: Dietitian - Part-Time'
+      DRCT_CARE_PRSNEL_CNT              = 'Staff Count: Direct Care'
+      FOOD_SRVC_CNTRCT_CNT              = 'Staff Count: Food Service Worker - Contract'
+      FOOD_SRVC_FLTM_CNT                = 'Staff Count: Food Service Worker - Full-Time'
+      FOOD_SRVC_PRTM_CNT                = 'Staff Count: Food Service Worker - Part-Time'
+      HH_AIDE_CNT                       = 'Staff Count: Home Health Aide'
+      HMMKR_EMPLEE_CNT                  = 'Staff Count: Homemaker - Employee'
+      HMMKR_VLNTR_CNT                   = 'Staff Count: Homemaker - Volunteer'
+      HSEKPNG_CNTRCT_CNT                = 'Staff Count: Housekeeping - Contract'
+      HSEKPNG_FLTM_CNT                  = 'Staff Count: Housekeeping - Full-Time'
+      HSEKPNG_PRTM_CNT                  = 'Staff Count: Housekeeping - Part-Time'
+      LAB_TCHNCN_CNT                    = 'Staff Count: Lab Technician'
+      LPN_CNT                           = 'Staff Count: LPN'
+      LPN_LVN_CNT                       = 'Staff Count: LPN/LVN - Employee'
+      LPN_LVN_CNTRCT_CNT                = 'Staff Count: LPN/LVN - Contract'
+      LPN_LVN_FLTM_CNT                  = 'Staff Count: LPN/LVN - Full-Time'
+      LPN_LVN_PRTM_CNT                  = 'Staff Count: LPN/LVN - Part-Time'
+      LPN_LVN_VLNTR_CNT                 = 'Staff Count: LPN/LVN - Volunteer'
+      MDCL_DRCTR_CNTRCT_CNT             = 'Staff Count: Medical Director - Contract'
+      MDCL_DRCTR_FLTM_CNT               = 'Staff Count: Medical Director - Full-Time'
+      MDCL_DRCTR_PRTM_CNT               = 'Staff Count: Medical Director - Part-Time'
+      MDCL_SCL_WORKR_CNT                = 'Staff Count: Medical Social Worker - Employee'
+      MDCL_SCL_WORKR_VLNTR_CNT          = 'Staff Count: Medical Social Worker - Volunteer'
+      MDCL_TCHNLGST_CNT                 = 'Staff Count: Medical Technologist'
+      MDCTN_AIDE_CNTRCT_CNT             = 'Staff Count: Medication Aide/Technician - Contract'
+      MDCTN_AIDE_FLTM_CNT               = 'Staff Count: Medication Aide/Technician - Full-Time'
+      MDCTN_AIDE_PRTM_CNT               = 'Staff Count: Medication Aide/Technician - Part-Time'
+      MENTL_HLTH_SRVC_CNTRCT_CNT        = 'Staff Count: Mental Health Services - Contract'
+      MENTL_HLTH_SRVC_FLTM_CNT          = 'Staff Count: Mental Health Services - Full-Time'
+      MENTL_HLTH_SRVC_PRTM_CNT          = 'Staff Count: Mental Health Services - Part-Time'
+      NUCLR_MDCN_TCHNCN_CNT             = 'Staff Count: Nuclear Medicine Technician'
+      NAT_CNTRCT_CNT                    = 'Staff Count: Nurse Aide in Training - Contract'
+      NAT_FLTM_CNT                      = 'Staff Count: Nurse Aide in Training - Full-Time'
+      NAT_PRTM_CNT                      = 'Staff Count: Nurse Aide in Training - Part-Time'
+      NRS_PRCTNR_CNT                    = 'Staff Count: Nurse Practitioner'
+      NRS_ADMINV_CNTRCT_CNT             = 'Staff Count: Nurse With Administrative Duties - Contract'
+      NRS_ADMINV_FLTM_CNT               = 'Staff Count: Nurse With Administrative Duties - Full-Time'
+      NRS_ADMINV_PRTM_CNT               = 'Staff Count: Nurse With Administrative Duties - Part-Time'
+      OCPTNL_THRPST_CNT                 = 'Staff Count: OT - Total'
+      OCPTNL_THRPST_CNTRCT_CNT          = 'Staff Count: OT - Arrangement'
+      OCPTNL_THRPST_FLTM_CNT            = 'Staff Count: OT - Full-Time'
+      OCPTNL_THRPST_PRTM_CNT            = 'Staff Count: OT - Part-Time'
+      OT_AIDE_CNTRCT_CNT                = 'Staff Count: OT Aide - Contract'
+      OT_AIDE_FLTM_CNT                  = 'Staff Count: OT Aide - Full-Time'
+      OT_AIDE_PRTM_CNT                  = 'Staff Count: OT Aide - Part-Time'
+      OT_ASTNT_CNTRCT_CNT               = 'Staff Count: OT Assistant - Contract'
+      OT_ASTNT_FLTM_CNT                 = 'Staff Count: OT Assistant - Full-Time'
+      OT_ASTNT_PRTM_CNT                 = 'Staff Count: OT Assistant - Part-Time'
+      VLNTR_OTHR_CNT                    = 'Staff Count: Other - Volunteer'
+      ACTVTY_STF_OTHR_CNTRCT_CNT        = 'Staff Count: Other Activities - Contract'
+      ACTVTY_STF_OTHR_FLTM_CNT          = 'Staff Count: Other Activities - Full-Time'
+      ACTVTY_STF_OTHR_PRTM_CNT          = 'Staff Count: Other Activities - Part-Time'
+      PHYSN_OTHR_CNTRCT_CNT             = 'Staff Count: Other Physician - Contract'
+      PHYSN_OTHR_FLTM_CNT               = 'Staff Count: Other Physician - Full-Time'
+      PHYSN_OTHR_PRTM_CNT               = 'Staff Count: Other Physician - Part-Time'
+      SCL_SRVC_OTHR_STF_CNTRCT_CNT      = 'Staff Count: Other Social Services - Contract'
+      SCL_SRVC_OTHR_STF_FLTM_CNT        = 'Staff Count: Other Social Services - Full-Time'
+      SCL_SRVC_OTHR_STF_PRTM_CNT        = 'Staff Count: Other Social Services - Part-Time'
+      STF_OTHR_CNTRCT_CNT               = 'Staff Count: Other Staff - Contract'
+      STF_OTHR_FLTM_CNT                 = 'Staff Count: Other Staff - Full-Time'
+      STF_OTHR_PRTM_CNT                 = 'Staff Count: Other Staff - Part-Time'
+      PHRMCST_CNTRCT_CNT                = 'Staff Count: Pharmacist - Contract'
+      PHRMCST_FLTM_CNT                  = 'Staff Count: Pharmacist - Full-Time'
+      PHRMCST_PRTM_CNT                  = 'Staff Count: Pharmacist - Part-Time'
+      PHYS_THRPST_CNTRCT_CNT            = 'Staff Count: Physical Therapist - Contract'
+      PHYS_THRPST_FLTM_CNT              = 'Staff Count: Physical Therapist - Full-Time'
+      PHYS_THRPST_PRTM_CNT              = 'Staff Count: Physical Therapist - Part-Time'
+      PHYSN_CNT                         = 'Staff Count: Physician - Employee'
+      PHYSN_VLNTR_CNT                   = 'Staff Count: Physician - Volunteer'
+      PHYSN_ASTNT_CNT                   = 'Staff Count: Physician Assistant'
+      PHYSN_EXT_CNTRCT_CNT              = 'Staff Count: Physician Extender - Contract'
+      PHYSN_EXT_FLTM_CNT                = 'Staff Count: Physician Extender - Full-Time'
+      PHYSN_EXT_PRTM_CNT                = 'Staff Count: Physician Extender - Part-Time'
+      RSDNT_PHYSN_CNT                   = 'Staff Count: Physician Resident'
+      PDTRST_CNTRCT_CNT                 = 'Staff Count: Podiatrist - Contract'
+      PDTRST_FLTM_CNT                   = 'Staff Count: Podiatrist - Full-Time'
+      PDTRST_PRTM_CNT                   = 'Staff Count: Podiatrist - Part-Time'
+      PSYCHLGST_CNT                     = 'Staff Count: Psychologist'
+      PHYS_THRPST_STF_CNT               = 'Staff Count: PT'
+      PHYS_THRPST_CNT                   = 'Staff Count: PT'
+      PHYS_THRPST_ARNGMT_CNT            = 'Staff Count: PT - Arrangement'
+      PT_AIDE_CNTRCT_CNT                = 'Staff Count: PT Aide - Contract'
+      PT_AIDE_FLTM_CNT                  = 'Staff Count: PT Aide - Full-Time'
+      PT_AIDE_PRTM_CNT                  = 'Staff Count: PT Aide - Part-Time'
+      PT_ASTNT_CNTRCT_CNT               = 'Staff Count: PT Assistant - Contract'
+      PT_ASTNT_FLTM_CNT                 = 'Staff Count: PT Assistant - Full-Time'
+      PT_ASTNT_PRTM_CNT                 = 'Staff Count: PT Assistant - Part-Time'
+      ACTVTY_PROFNL_CNTRCT_CNT          = 'Staff Count: Qualified Activities Professional - Contract'
+      ACTVTY_PROFNL_FLTM_CNT            = 'Staff Count: Qualified Activities Professional - Full-Time'
+      ACTVTY_PROFNL_PRTM_CNT            = 'Staff Count: Qualified Activities Professional - Part-Time'
+      RDLGY_TCHNCN_CNT                  = 'Staff Count: Radiology Technician'
+      REG_PHRMCST_CNT                   = 'Staff Count: Registered Pharmacist'
+      INHLTN_THRPST_CNT                 = 'Staff Count: Respiratory Therapist'
+      RN_CNT                            = 'Staff Count: RN'
+      RN_CNTRCT_CNT                     = 'Staff Count: RN - Contract'
+      RN_FLTM_CNT                       = 'Staff Count: RN - Full-Time'
+      RN_PRTM_CNT                       = 'Staff Count: RN - Part-Time'
+      RN_VLNTR_CNT                      = 'Staff Count: RN - Volunteer'
+      RN_DRCTR_CNTRCT_CNT               = 'Staff Count: RN Director of Nursing - Contract'
+      RN_DRCTR_FLTM_CNT                 = 'Staff Count: RN Director of Nursing - Full-Time'
+      RN_DRCTR_PRTM_CNT                 = 'Staff Count: RN Director of Nursing - Part-Time'
+      SCL_WORKR_CNT                     = 'Staff Count: Social Worker'
+      SCL_WORKR_CNTRCT_CNT              = 'Staff Count: Social Worker - Contract'
+      SCL_WORKR_FLTM_CNT                = 'Staff Count: Social Worker - Full-Time'
+      SCL_WORKR_PRTM_CNT                = 'Staff Count: Social Worker - Part-Time'
+      SPCH_PTHLGST_ARNGMT_CNT           = 'Staff Count: Speech Pathologist - Arrangement'
+      SPCH_PTHLGST_CNTRCT_CNT           = 'Staff Count: Speech Pathologist - Contract'
+      SPCH_PTHLGST_FLTM_CNT             = 'Staff Count: Speech Pathologist - Full-Time'
+      SPCH_PTHLGST_PRTM_CNT             = 'Staff Count: Speech Pathologist - Part-Time'
+      SPCH_PTHLGST_CNT                  = 'Staff Count: Speech Pathologist - Total'
+      SPCH_PTHLGST_AUDLGST_CNT          = 'Staff Count: Speech Pathologist/Audiologist'
+      TCHNCL_STF_NUM                    = 'Staff Count: Technical Staff'
+      TCHNCN_CNT                        = 'Staff Count: Technician'
+      THRPTC_RCRTNL_CNTRCT_CNT          = 'Staff Count: Therapeutic Recreational Specialist - Contract'
+      THRPTC_RCRTNL_FLTM_CNT            = 'Staff Count: Therapeutic Recreational Specialist - Full-Time'
+      THRPTC_RCRTNL_PRTM_CNT            = 'Staff Count: Therapeutic Recreational Specialist - Part-Time'
+      EMPLEE_CNT                        = 'Staff Count: Total - Employee'
+      VLNTR_CNT                         = 'Staff Count: Total - Volunteer'
+      SBUNIT_CNT                        = 'Subunit Count'
+      SBUNIT_SW                         = 'Subunit Indicator'
+      SBUNIT_OPRTN_SW                   = 'Subunit Operation Indicator'
+      DNTL_SRGRY_SW                     = 'Surgical Specialty: Dental Indicator'
+      OTLRYNGLGY_SRGRY_SW               = 'Surgical Specialty: Ear/Nose/Throat Indicator'
+      ENDSCPY_SRGRY_SW                  = 'Surgical Specialty: Endoscopy Indicator'
+      OB_GYN_SRGRY_SW                   = 'Surgical Specialty: Obstetrics / Gynecology Indicator'
+      OPTHMLGY_SRGRY_SW                 = 'Surgical Specialty: Ophthalmologic Indicator'
+      ORTHPDC_SRGRY_SW                  = 'Surgical Specialty: Orthopedic Indicator'
+      OTHR_SRGRY_SW                     = 'Surgical Specialty: Other Indicator'
+      PAIN_SRGRY_SW                     = 'Surgical Specialty: Pain Indicator'
+      PLSTC_SRGRY_SW                    = 'Surgical Specialty: Plastic / Reconstructive Indicator'
+      FT_SRGRY_SW                       = 'Surgical Specialty: Podiatry Indicator'
+      SB_SW                             = 'Swing Bed Indicator'
+      SB_SIZE_CD                        = 'Swing Bed Size Code'
+      TCHNLGST_2_YR_RDLGC_CNT           = 'Technologist Count: 24-Month Radiologic School'
+      TCHNLGST_ASCT_DGR_CNT             = 'Technologist Count: Associate Degree'
+      TCHNLGST_BS_BA_DGR_CNT            = 'Technologist Count: BS or BA Degree'
+      DLYS_STN_CNT                      = 'Total Approved Stations'
+;
