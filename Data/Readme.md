@@ -35,7 +35,7 @@ _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Provider-of-Services/index.html
 Note: including 2010 POS file to allow for leading indicators. Hospitals may be responding to market conditions in the prior year to set charges for the current year.
 __Stats:__
-* 676,131 rows (avg. 135,226 per year)
+* 28,573 rows (avg. 7,143 per year)
 Primary elements
 * Number of times this provider has undergone a change of ownership
 * Facility is eligible to participate in the Medicare and/or Medicaid programs (1/0).
