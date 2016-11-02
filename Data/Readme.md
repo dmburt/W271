@@ -3,6 +3,7 @@
 
 ## Data Sets
 
+
 ###Inpatient Charge Data, 2011-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/
@@ -22,6 +23,7 @@ __Primary elements:__
 * Average charge per discharge (stay)
 * Average Medicare payment per discharge (stay)
 
+
 ###Medicare Fee-for-Service Enrollment, 2011-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/CMSProgramStatistics/2013/Enrollment.html#Total (Fee-For-Service and Managed Care) Medicare Enrollment
@@ -33,6 +35,7 @@ __Primary elements__
 * State
 * Hospital referral region
 * Number of Medicare beneficiaries (Part A and Part B)
+
 
 ###Provider of Services, 2010-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
@@ -55,6 +58,7 @@ __Primary elements__
 * Number of full-time equivalent registered nurses employed by a provider
 * Hospital location (city, state, ZIP, CBSA, urban/rural indicator)
 * There are over 180 hospital-level data elements in this file. We will choose a reasonable explanatory subset of these (in addition to those above) prior to analysis.
+
 
 ## History
 01 Nov 2016: 
