@@ -4,7 +4,7 @@
 ## Data Sets
 
 
-###Inpatient Charge Data, 2011-2014
+###Inpatient Charge Data by Hospital and DRG, 2011-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/
 
@@ -17,6 +17,24 @@ __Stats:__
 __Primary elements:__
 * Hospital identifier, name
 * Hospital location (address, city, state, ZIP)
+* Hospital Referral Region
+* Diagnosis-Related Group
+* Year (of date discharged)
+* Number of inpatient discharges
+* Average charge per discharge (stay)
+* Average Medicare payment per discharge (stay)
+
+
+###Inpatient Charge Data by Hospital and DRG, 2011-2014
+_Source: summarization of data found in the_ Inpatient Charge Data by Hospital and DRG _dataset (see above)._
+__Stats:__
+* 144,342 rows
+* 306 hospital referral regions (local markets)
+* 565 services
+* 27,453,280 discharges (avg. 6,863,320 per year)
+
+__Primary elements:__
+* Hospital Referral Region
 * Diagnosis-Related Group
 * Year (of date discharged)
 * Number of inpatient discharges
@@ -64,6 +82,10 @@ __Primary elements__
 01 Nov 2016: 
 
 1. Created repository
-2. Loaded original and combined data sets.
-             
+2. Uploaded original and combined data sets.
+
+06 Nov 2016:
+
+3. Uploaded HRR charges file (summary of IP charges by hospital referral region).
+
 
