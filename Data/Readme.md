@@ -25,7 +25,7 @@ __Primary elements:__
 * Average Medicare payment per discharge (stay)
 
 
-###Inpatient Charge Data by Hospital and DRG, 2011-2014
+###Inpatient Charge Data by Hospital Referral Region, 2011-2014
 _Source: summarization of data found in the_ Inpatient Charge Data by Hospital and DRG _dataset (see above)._
 __Stats:__
 * 144,342 rows
