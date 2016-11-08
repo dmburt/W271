@@ -81,11 +81,17 @@ __Primary elements__
 ## History
 01 Nov 2016: 
 
-1. Created repository
-2. Uploaded original and combined data sets.
+* Created repository
+* Uploaded original and combined data sets.
 
 06 Nov 2016:
 
-3. Uploaded HRR charges file (summary of IP charges by hospital referral region).
+* Uploaded HRR charges file (summary of IP charges by hospital referral region).
 
+07 Nov 2016:
 
+* Updated DRG descriptions for DRG 065 for:
+..* 2013 IP Charge data set
+..* 2014 IP Charge data set
+..* HRR Summary IP Charge data set
+The DRG descriptions were inconsistent across years (2011-2012 had one description, and 2013-2014 had a different description).  In the updated data sets, this has been fixed to make all descriptions for DRG 065 consistent: "065 - INTRACRANIAL HEMORRHAGE OR CEREBRAL INFARCTION W CC."
