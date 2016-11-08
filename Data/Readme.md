@@ -94,4 +94,5 @@ __Primary elements__
     - 2013 IP Charge data set
     - 2014 IP Charge data set
     - HRR Summary IP Charge data set  
+    
 &nbsp;&nbsp;The DRG descriptions were inconsistent across years (2011-2012 had one description, and 2013-2014 had a different description).  In the updated data sets, this has been fixed to make all descriptions for DRG 065 consistent: "065 - INTRACRANIAL HEMORRHAGE OR CEREBRAL INFARCTION W CC."
