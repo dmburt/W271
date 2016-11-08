@@ -79,16 +79,16 @@ __Primary elements__
 
 
 ## History
-01 Nov 2016: 
+#### 01 Nov 2016: 
 
 * Created repository
 * Uploaded original and combined data sets.
 
-06 Nov 2016:
+#### 06 Nov 2016:
 
 * Uploaded HRR charges file (summary of IP charges by hospital referral region).
 
-07 Nov 2016:
+#### 07 Nov 2016:
 
 * Updated DRG descriptions for DRG 065 for:
     - 2013 IP Charge data set
