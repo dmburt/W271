@@ -11,6 +11,6 @@ Data were loaded to the following tables:
 | --- | --- |
 | Medicare Provider Charge Inpatient | [dbo].[IP_Charge] |
 | Provider of Services | [dbo].[Provider_of_Services_File] |
-| DRG | DRG|
+| DRG | [dbo].[DRG] |
 
 
