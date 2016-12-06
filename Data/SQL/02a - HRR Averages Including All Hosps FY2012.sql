@@ -1,4 +1,4 @@
-drop table HRR_IP_Charge_All_Hosps;
+drop table HRR_IP_Charge_All_Hosps_FY2012;
 select 
        ip.[HRR],
 	   ip.[DRG],
