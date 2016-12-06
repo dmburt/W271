@@ -14,6 +14,8 @@ Can we gain insight into the factors that motivate shifts in hospital charges? D
 
 Our initial hypothesis is that hospitals, as businesses, set their charges in response to market rates and demand. The use of health care resources is highly localized. Most Americans use the services of hospitals nearby, and it logically follows that a hospital’s charges could be heavily influenced by the charges of its local competitors. We can model the charges in year _y_ as a function of the charges for a hospital in the prior year and charges for other hospitals in the same geographical area<sup>[2](#footnote2)</sup> in that same prior year, weighted by the number of services provided, and conditioned on other explanatory variables, including the number of employed physicians, nurses, beds, and number of affiliated providers.  Given that different hospitals have different mixes of services, we will standardize the charges using the DRG relative weights applicable to the hospitals' services.
 
+---
+
 
 <a name="footnote1">_1_</a>: _The level of service granularity here is the diagnosis related group (DRG). A DRG is a standard unit for inpatient payment that is designed to describe the expected resource cost of an inpatient acute-care hospital stay, given the nature of the illness of the associated patient._
 
