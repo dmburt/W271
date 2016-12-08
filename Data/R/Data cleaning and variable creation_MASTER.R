@@ -1,6 +1,6 @@
 # This script uploads the most recent data, cleans it, and creates all variables needed for analysis
 # The output is a dataframe that will be used for the enirity of analysis
-
+library(dplyr)
 # loading data and saving to a dataframe
 #setwd("~/Desktop/Cal/MIDS/271/271 final project/")
 #d <- read.delim("W271_Lab3_Dataset_By_Hosp.txt")
@@ -25,12 +25,21 @@ d$N_PROVIDERS = d$N_NURSES + d$N_PHYSICIANS
 d$BENEFICIARIES_PER_PROVIDER = d$PART_A_BENEFICIARIES/d$N_HOSPS_IN_HRR/1000
 d$BED_CNT_PER_THOUSAND_BENEFICIARIES = d$BED_CNT/d$BENEFICIARIES_PER_PROVIDER
 
+# Create percent of HRR that urban and have residency program
 d$urban_dummy = ifelse(d$URBAN_RURAL_IND =='U',1,0)
 d$RESIDENCY_PROGRAM_DUMMY = ifelse(d$RESIDENCY_PROGRAM_IND=='Y',1,0)
 d = d %>% group_by(HRR) %>% 
   summarise(HRR_PERCENT_URBAN = mean(urban_dummy, na.rm =T)*100,
             HRR_PERCENT_RESIDENT = mean(RESIDENCY_PROGRAM_DUMMY, na.rm = T)*100) %>%
   right_join(d, by = 'HRR')
+
+# Create discharges per bed count
+d$FY2012_DISCHARGES_PER_BED = d$N_FY2012_DISCHARGES/d$BED_CNT
+d$FY2013_DISCHARGES_PER_BED = d$N_FY2013_DISCHARGES/d$BED_CNT
+d$DIFF_13_12_DISCHARGES_PER_BED = d$FY2013_DISCHARGES_PER_BED - d$FY2012_DISCHARGES_PER_BED
+
+# Create dummy variable for private for profit hospitals
+d$OWNERSHIP_FOR_PROFIT = ifelse(d$TYPE_OF_OWNERSHIP == 'PRIVATE FOR PROFIT',1,0)
 
 # Checking for and removing observations with missing values
 sapply(d, function(x) sum(is.na(x))) 
