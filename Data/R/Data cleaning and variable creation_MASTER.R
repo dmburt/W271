@@ -32,9 +32,9 @@ d = d %>% group_by(HRR) %>%
             HRR_PERCENT_RESIDENT = mean(RESIDENCY_PROGRAM_DUMMY, na.rm = T)*100) %>%
   right_join(d, by = 'HRR')
 
-# Checking for missing values
-sapply(d, function(x) sum(is.na(x))) # only missing values are in bed count; how do we want to deal with these?
+# Checking for and removing observations with missing values
+sapply(d, function(x) sum(is.na(x))) 
 d = d[complete.cases(d),]
 
-# big outliers, remove?
-#d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
+# Removing big outliers due to ungroupable DRG's
+d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
