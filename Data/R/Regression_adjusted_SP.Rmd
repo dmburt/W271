@@ -12,6 +12,8 @@ library(ggplot2)
 library(stargazer)
 library(car)
 library(lmtest)
+library(ivpack)
+
 
 setwd("c:/Users/Steve/Documents/mids/w_271/project/W271/Data/R/")
 d <- read.delim("../../../W271_Lab3_Dataset_By_Hosp.txt")
@@ -34,11 +36,6 @@ ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOS
        y = 'Average HRR Charges ($)', 
        title = 'Adjusted Average Adjusted Charges for Provider and Its HRR')
 
-#drop 0 values
-table(d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP == 0)
-table(d$FY2013_AVG_CHG == 0)
-d = d[ which(d$FY2013_AVG_CHG!=0 & d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP!=0), ]
-
 #correlation of .72
 cor(d$FY2013_ADJUSTED_AVG_CHG, d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP, use = "pairwise.complete.obs")
 ```
@@ -46,17 +43,13 @@ cor(d$FY2013_ADJUSTED_AVG_CHG, d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP, use
 Despite this relationship, there is still variance in charges within an HRR. We created a variable that represents the percent of average HRR charge for each provider. Provider charges ranged from 15 to 279% of their average HRR charge, with an average of 91.3% and a standard deviation of 31 percentage points. The distribution is mostly normal (though SW test was significant), but has a slight positive skew. This will serve as a our primary independent variable as a proxy for local market competition.
 
 ```{r}
-#create variable 
-d$FY2013_ADJUSTED_AVG_CHG_RELATIVE = (d$FY2013_ADJUSTED_AVG_CHG / d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP) * 100 - 100
-
-
-summary(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
-sd(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, na.rm = T)
+summary(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
+sd(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, na.rm = T)
 
 #distribution kind of normal looking. slight positive skew
-hist(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, breaks = 40)
-qqPlot(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
-shapiro.test(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
+hist(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, breaks = 40)
+qqPlot(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
+shapiro.test(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
 ```
 
 ##Difference in Adjusted Charges 2013-14
@@ -66,17 +59,8 @@ For the most part, adjusted charges between 2013 and 2014 did not change too dra
 #look at relationship between 2013 and 14 charges
 ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, FY2014_ADJUSTED_AVG_CHG)) + geom_point()
 
-#drop 0s
-table(d$FY2013_AVG_CHG==0)
-table(d$FY2014_AVG_CHG==0)
-d = d[ d$FY2014_AVG_CHG!=0, ]
-
 #two huge outliers
 boxplot(d$DIFF_14_13_ADJUSTED_AVG_CHG)
-
-#drop two huge outliers
-d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
-
 
 summary(d$DIFF_14_13_ADJUSTED_AVG_CHG)
 sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)
@@ -89,39 +73,39 @@ In order to assess our hypothesis that local market competition is a primary dri
 
 ```{r}
 #Weak positive relationship
-ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
   geom_point() + geom_smooth(method = 'lm')
 
 #Tiny correlation
-cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
+cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
 
 # Statistically, but not necessairily practically significant
-summary(lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE))
-4.666/sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)
+adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
+stargazer(adj_model0, type = "text")
+adj_model0$coefficients[2]/sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T) * 100
 
-#starting model
-adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE)
-```
+hist(adj_model0$residuals, breaks = 50)
+plot(adj_model0$fitted.values, adj_model0$residuals, 
+     xlab = "Fitted values", ylab = "Residuals", 
+     main = "Residuals vs Fitted") 
+par(mfrow = c(2,2))
+plot(adj_model0)
+par(mfrow = c(1,1))
 
-Before adding covariates, we tried to account for local market differences in the dependent variable by comparing the difference in 13-14 adjusted charges for each provider to the average changes observed in the HRR. This did not produce very different results in a bivariate analysis, so for clarity-sake, we will stay with the original dependent variable.
+#drop two huge outliers outside of cook's distance
+d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
 
-```{r}
-#compute 2013-14 change variable by HRR and merge with dataset
-d = d %>% group_by(HRR) %>% 
-  summarise(HRR_DIFF_14_13_ADJUSTED_AVERAGE_CHARGE = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
-  right_join(d, by = "HRR")
-d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE = d$DIFF_14_13_ADJUSTED_AVG_CHG - d$HRR_DIFF_14_13_ADJUSTED_AVERAGE_CHARGE
 
-#highly correlated with original depdendent variable
-ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE)) + 
-  geom_point() + geom_smooth(method = 'lm')
-cor(d$DIFF_14_13_ADJUSTED_AVG_CHG, d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
+adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
 
-#not much difference in bivariate model
-ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE)) + 
-  geom_point() + geom_smooth(method = 'lm')
-cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
-summary(lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE))
+par(mfrow = c(2,2))
+plot(adj_model0)
+par(mfrow = c(1,1))
+
+se_adj_model0 = robust.se(adj_model0)[,2]
+stargazer(adj_model0, 
+          type = "text"
+          , se = list(se_adj_model0 ))
 ```
 
 ##Building the adjusted charges model
@@ -131,7 +115,6 @@ summary(lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE ~ FY2013_ADJUSTED_AVG_
 In theory, the size of the HRR market relative to the number of providers should influence adjusted charges since a relatively crowded market should be more competitive. We used the average number of Part A beneficiaries per hospital in an HRR as a proxy for this phenomenon. Indeed, we observed a positive relationship in bivariate analysis that was preserved when added to the regression, and is statistically and practically significant. There is a $31.75 dollar increase for every 1,000 Part A beneficiaries per provider in an HRR. Thus, this will remain in our model.
 
 ```{r}
-d$BENEFICIARIES_PER_PROVIDER = d$PART_A_BENEFICIARIES/d$N_HOSPS_IN_HRR/1000 #in thousands
 hist(d$BENEFICIARIES_PER_PROVIDER, breaks = 20)
 summary(d$BENEFICIARIES_PER_PROVIDER)
 
@@ -141,24 +124,32 @@ ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, DIFF_14_13_ADJUSTED_AVG_CHG)) +
 cor(d$BENEFICIARIES_PER_PROVIDER, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
 
 #a bit higher positive relationship with independent variable
-ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, FY2013_ADJUSTED_AVG_CHG_RELATIVE)) + 
+ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)) + 
   geom_point() + geom_smooth(method = 'lm')
-cor(d$BENEFICIARIES_PER_PROVIDER, d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
+cor(d$BENEFICIARIES_PER_PROVIDER, d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, use = "pairwise.complete.obs")
 
 #add to model. Slight improvement
-adj_model1 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+adj_model1 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER)
-stargazer(adj_model0,adj_model1, type = "text" )
+
+par(mfrow = c(2,2))
+plot(adj_model1)
+par(mfrow = c(1,1))
+
+se_adj_model1 = robust.se(adj_model1)[,2]
+
+stargazer(adj_model0, adj_model1,
+          type = "text"
+          , se = list(se_adj_model0, se_adj_model1 ))
 AIC(adj_model0,adj_model1)
+
 ```
+
 ###Bed Count
 
 Bed count is a proxy for the size of the provider. While we expect it to be positively correlated with average number of Part A beneficiaries per provider (r = .16), a good part of the variation in this correlation represents the fact that there are major discrepancies in provider size within HRRs. This discrepancy is likely a factor in local market competition when providers are setting charges. After computing the size of a provider relative to its HRR and entering this variable into the model, we found that the AIC dropped and R2 increased considerably. Furthermore, adding in this variable greatly reduced the coefficient of our primary independent variable, which is no longer statistically significant.
 
 ```{r}
-
-
-
 #Provider (bed count) vs HRR (Part A beneficiaries) Size
 ggplot(d, aes(BED_CNT, BENEFICIARIES_PER_PROVIDER)) + 
   geom_point() + geom_smooth(method = 'lm') +
@@ -170,16 +161,21 @@ summary(d$BED_CNT)
 stargazer(d %>% group_by(HRR) %>% 
   summarise(Within_HRR_BED_COUNT_STDV = sd(BED_CNT, na.rm = T)) %>% data.frame(), type = "text")
 
-#Relative size of provider within a market
-d$BED_CNT_PER_THOUSAND_BENEFICIARIES = d$BED_CNT/d$BENEFICIARIES_PER_PROVIDER
-
-adj_model2 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+adj_model2 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES)
-stargazer(adj_model1,adj_model2, type = "text" )
-AIC(adj_model1,adj_model2)
 
 
+par(mfrow = c(2,2))
+plot(adj_model2)
+par(mfrow = c(1,1))
+
+se_adj_model2 = robust.se(adj_model2)[,2]
+
+stargazer(adj_model0, adj_model1,adj_model2,
+          type = "text"
+          , se = list(se_adj_model0, se_adj_model1, se_adj_model2 ))
+AIC(adj_model0,adj_model1,adj_model2)
 
 ```
 
@@ -191,7 +187,8 @@ On average, urban providers increased their charges at nearly twice the rate of 
 ```{r}
 #summary stats by rural/urban
 stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
-  summarise(avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+  summarise(count = n(),
+            avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             median = median(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
@@ -202,12 +199,119 @@ stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
 ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = URBAN_RURAL_IND, colour = URBAN_RURAL_IND)) + 
   geom_density(alpha = .1)
 
-adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   URBAN_RURAL_IND)
-stargazer(adj_model3,adj_model2, type = "text" )
-AIC(adj_model3,adj_model2)
+
+par(mfrow = c(2,2))
+plot(adj_model3)
+par(mfrow = c(1,1))
+
+se_adj_model3 = robust.se(adj_model3)[,2]
+
+stargazer(adj_model0, adj_model1,adj_model2, adj_model3,
+          type = "text"
+          , se = list(se_adj_model0, se_adj_model1, se_adj_model2, se_adj_model3 ))
+AIC(adj_model0,adj_model1,adj_model2,adj_model3)
+
+#################################
+d$urban_dummy = ifelse(d$URBAN_RURAL_IND =='U',1,0)
+d$RESIDENCY_PROGRAM_DUMMY = ifelse(d$RESIDENCY_PROGRAM_IND=='Y',1,0)
+
+d = d %>% group_by(HRR) %>% 
+  summarise(HRR_PERCENT_URBAN = mean(urban_dummy, na.rm =T)*100,
+            HRR_PERCENT_RESIDENT = mean(RESIDENCY_PROGRAM_DUMMY, na.rm = T)*100) %>%
+  right_join(d, by = 'HRR')
+#####################################
+
+adj_model4 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  URBAN_RURAL_IND +
+                  HRR_PERCENT_URBAN)
+se_adj_model4 = robust.se(adj_model4)[,2]
+
+stargazer(adj_model0, adj_model1,adj_model2, adj_model3, adj_model4,
+          type = "text"
+          , se = list(se_adj_model0, se_adj_model1, se_adj_model2, se_adj_model3, se_adj_model4 ))
+AIC(adj_model0,adj_model1,adj_model2,adj_model3, adj_model4)
+
+adj_model5 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN)
+se_adj_model5 = robust.se(adj_model5)[,2]
+
+stargazer(adj_model3, adj_model4,adj_model5,
+          type = "text"
+          , se = list( se_adj_model3, se_adj_model4,se_adj_model5  ))
+AIC(adj_model3, adj_model4,adj_model5 )
 
 ```
 
+###Residency
+
+Not significant, don't include
+```{r}
+#summary stats by residency
+stargazer(d %>% group_by(RESIDENCY_PROGRAM_IND) %>%
+  summarise(count = n(),
+            avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            median = median(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
+    data.frame(), type = "text", summary = F)
+ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = RESIDENCY_PROGRAM_IND, colour = RESIDENCY_PROGRAM_IND)) + 
+  geom_density(alpha = .1)
+
+#add residency
+adj_model6 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  RESIDENCY_PROGRAM_IND)
+
+se_adj_model6 = robust.se(adj_model6)[,2]
+
+stargazer(adj_model2, adj_model5,adj_model6,
+          type = "text"
+          , se = list( se_adj_model2, se_adj_model5,se_adj_model6  ))
+AIC(adj_model3, adj_model5,adj_model6 )
+
+#replace with percent residency
+adj_model7 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT )
+
+se_adj_model7 = robust.se(adj_model7)[,2]
+
+stargazer(adj_model2, adj_model5,adj_model7,
+          type = "text"
+          , se = list( se_adj_model2, se_adj_model5,se_adj_model7  ))
+AIC(adj_model3, adj_model5,adj_model7 )
+
+#try interaction
+adj_model8 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY)
+
+se_adj_model8 = robust.se(adj_model8)[,2]
+
+stargazer(adj_model2, adj_model5,adj_model8,
+          type = "text"
+          , se = list( se_adj_model2, se_adj_model5,se_adj_model8  ))
+AIC(adj_model3, adj_model5,adj_model8 )
+linearHypothesis(adj_model8, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_IND = 0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_IND"))
+linearHypothesis(adj_model8, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_DUMMY =0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_DUMMY=0"))
+
+ggplot(data = d, aes(HRR_PERCENT_RESIDENT, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(RESIDENCY_PROGRAM_DUMMY))) + 
+  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Residency")
+```
