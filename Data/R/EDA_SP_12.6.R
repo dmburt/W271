@@ -1,9 +1,7 @@
 # Set working directory
 setwd("c:/Users/Steve/Documents/mids/w_271/project/W271/Data/R/")
+d <- read.delim("../../../W271_Lab3_Dataset_By_Hosp.txt")
 
-
-#Steve starts exploring
-#-----------------------------------------------------------------------------------
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -23,7 +21,7 @@ HRR = d %>% group_by(HRR) %>%
 #Distribution of HRR charges. Has positive skew.
 hist(HRR$FY2013_ADJUSTED_AVG_CHG, breaks = 30)
 
-
+View(us.cities)
 #Map HRRs
 all_cities = us.cities %>% 
   unite(HRR, c(country.etc, name), sep = " - ", remove = F) %>%

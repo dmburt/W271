@@ -182,9 +182,12 @@ AIC(adj_model0,adj_model1,adj_model2)
 
 ###Urban vs Rural
 
-On average, urban providers increased their charges at nearly twice the rate of rural providers between 2013 and 2014. We added this indicator variable to the model to account for some of the (huge) variance still left. It is statistically and practically signficant.
+It is well established that urban areas are more expensive than rural areas, and could thus have a large impact on provider charges. There are two variables in the dataset denoting rural/urban discrepancies: 1) percent of providers in an HRR that are urban, 2) the urban/rural status of an individual provider. Either or both (potential interaction) could have an impact on adjusted charges. 
+
+On average, urban providers increased their charges at nearly twice the rate of rural providers between 2013 and 2014, and there is a small positive correlation between adjusted charges and the percent of HRR that is urban (r = .09). We tried out different combinations of these variables in our mode. Both were significant by themselves, only HRR urban percentage was significant when added together, and when an interaction effect was added, it was not significant. We selected the model with this lowest AIC (56893), which was just HRR urban percentage.
 
 ```{r}
+#Summary stats and plots
 #summary stats by rural/urban
 stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
   summarise(count = n(),
@@ -199,60 +202,62 @@ stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
 ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = URBAN_RURAL_IND, colour = URBAN_RURAL_IND)) + 
   geom_density(alpha = .1)
 
+#huge variability in the 100% urban section
+ggplot(data = d, aes(HRR_PERCENT_URBAN, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(URBAN_RURAL_IND))) + 
+  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Provider \nU/R Status")
+cor(d$HRR_PERCENT_URBAN,d$DIFF_14_13_ADJUSTED_AVG_CHG)
+
+#compare models
+#provider urban/rural status
 adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
-                  URBAN_RURAL_IND)
-
-par(mfrow = c(2,2))
-plot(adj_model3)
-par(mfrow = c(1,1))
+                  urban_dummy)
 
 se_adj_model3 = robust.se(adj_model3)[,2]
 
-stargazer(adj_model0, adj_model1,adj_model2, adj_model3,
-          type = "text"
-          , se = list(se_adj_model0, se_adj_model1, se_adj_model2, se_adj_model3 ))
-AIC(adj_model0,adj_model1,adj_model2,adj_model3)
 
-#################################
-d$urban_dummy = ifelse(d$URBAN_RURAL_IND =='U',1,0)
-d$RESIDENCY_PROGRAM_DUMMY = ifelse(d$RESIDENCY_PROGRAM_IND=='Y',1,0)
-
-d = d %>% group_by(HRR) %>% 
-  summarise(HRR_PERCENT_URBAN = mean(urban_dummy, na.rm =T)*100,
-            HRR_PERCENT_RESIDENT = mean(RESIDENCY_PROGRAM_DUMMY, na.rm = T)*100) %>%
-  right_join(d, by = 'HRR')
-#####################################
-
+#percent of HRR that is urban instead
 adj_model4 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
-                  URBAN_RURAL_IND +
                   HRR_PERCENT_URBAN)
 se_adj_model4 = robust.se(adj_model4)[,2]
 
-stargazer(adj_model0, adj_model1,adj_model2, adj_model3, adj_model4,
-          type = "text"
-          , se = list(se_adj_model0, se_adj_model1, se_adj_model2, se_adj_model3, se_adj_model4 ))
-AIC(adj_model0,adj_model1,adj_model2,adj_model3, adj_model4)
-
+#both urban/rural variables
 adj_model5 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  urban_dummy +
                   HRR_PERCENT_URBAN)
 se_adj_model5 = robust.se(adj_model5)[,2]
 
-stargazer(adj_model3, adj_model4,adj_model5,
+#both urban/rural variables with interaction
+adj_model6 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  urban_dummy +
+                  HRR_PERCENT_URBAN +
+                  urban_dummy * HRR_PERCENT_URBAN)
+se_adj_model6 = robust.se(adj_model6)[,2]
+robust.se(adj_model6)
+stargazer(adj_model3, adj_model4,adj_model5,adj_model6,
           type = "text"
-          , se = list( se_adj_model3, se_adj_model4,se_adj_model5  ))
-AIC(adj_model3, adj_model4,adj_model5 )
+          , se = list( se_adj_model3, se_adj_model4,se_adj_model5,se_adj_model6  ))
+AIC(adj_model3, adj_model4,adj_model5,adj_model6 )
 
+par(mfrow = c(2,2))
+plot(adj_model3)
+plot(adj_model4)
+plot(adj_model5)
+plot(adj_model6)
+par(mfrow = c(1,1))
 ```
 
 ###Residency
 
-Not significant, don't include
+Same deal as urban just with residency. write later. Neither are significant by themselves, but when added together with an interaction, they are. Adding all three significantly improved the model (f = 2.95, p < .05).
+
 ```{r}
 #summary stats by residency
 stargazer(d %>% group_by(RESIDENCY_PROGRAM_IND) %>%
@@ -263,55 +268,196 @@ stargazer(d %>% group_by(RESIDENCY_PROGRAM_IND) %>%
             min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
     data.frame(), type = "text", summary = F)
+
+#density plot
 ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = RESIDENCY_PROGRAM_IND, colour = RESIDENCY_PROGRAM_IND)) + 
   geom_density(alpha = .1)
 
-#add residency
-adj_model6 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
-                  BENEFICIARIES_PER_PROVIDER + 
-                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
-                  HRR_PERCENT_URBAN +
-                  RESIDENCY_PROGRAM_IND)
+#same trend as urban/rural, though interaction effect looks potentially bigger
+ggplot(data = d, aes(HRR_PERCENT_RESIDENT, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(RESIDENCY_PROGRAM_DUMMY))) + 
+  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Residency")
+cor(d$HRR_PERCENT_RESIDENT,d$DIFF_14_13_ADJUSTED_AVG_CHG)
 
-se_adj_model6 = robust.se(adj_model6)[,2]
-
-stargazer(adj_model2, adj_model5,adj_model6,
-          type = "text"
-          , se = list( se_adj_model2, se_adj_model5,se_adj_model6  ))
-AIC(adj_model3, adj_model5,adj_model6 )
-
-#replace with percent residency
+#compare models
+#just provider residency status
 adj_model7 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
-                  HRR_PERCENT_RESIDENT )
-
+                  RESIDENCY_PROGRAM_DUMMY)
 se_adj_model7 = robust.se(adj_model7)[,2]
 
-stargazer(adj_model2, adj_model5,adj_model7,
-          type = "text"
-          , se = list( se_adj_model2, se_adj_model5,se_adj_model7  ))
-AIC(adj_model3, adj_model5,adj_model7 )
-
-#try interaction
+#just percent residency
 adj_model8 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT )
+se_adj_model8 = robust.se(adj_model8)[,2]
+
+#both provider residency status and percent residency
+adj_model9 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY)
+se_adj_model9 = robust.se(adj_model9)[,2]
+
+#add interaction
+adj_model10 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
                   HRR_PERCENT_RESIDENT +
                   RESIDENCY_PROGRAM_DUMMY +
                   HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY)
+se_adj_model10 = robust.se(adj_model10)[,2]
 
-se_adj_model8 = robust.se(adj_model8)[,2]
-
-stargazer(adj_model2, adj_model5,adj_model8,
+stargazer(adj_model4, adj_model7, adj_model8,adj_model9,adj_model10,
           type = "text"
-          , se = list( se_adj_model2, se_adj_model5,se_adj_model8  ))
-AIC(adj_model3, adj_model5,adj_model8 )
-linearHypothesis(adj_model8, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_IND = 0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_IND"))
-linearHypothesis(adj_model8, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_DUMMY =0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_DUMMY=0"))
+          , se = list(se_adj_model4, se_adj_model7, se_adj_model8,se_adj_model9, se_adj_model10))
+AIC(adj_model4, adj_model7, adj_model8,adj_model9,adj_model10 )
 
-ggplot(data = d, aes(HRR_PERCENT_RESIDENT, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(RESIDENCY_PROGRAM_DUMMY))) + 
-  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Residency")
+
+linearHypothesis(adj_model10, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_DUMMY =0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_DUMMY=0"))
+
+```
+
+###Discharges per bed count
+
+Proxy for business. 
+
+```{r}
+d$FY2012_DISCHARGES_PER_BED = d$N_FY2012_DISCHARGES/d$BED_CNT
+d$FY2013_DISCHARGES_PER_BED = d$N_FY2013_DISCHARGES/d$BED_CNT
+#d$FY2014_DISCHARGES_PER_BED = d$N_FY2014_DISCHARGES/d$BED_CNT
+
+#d$DIFF_14_13_DISCHARGES_PER_BED = d$FY2014_DISCHARGES_PER_BED - d$FY2013_DISCHARGES_PER_BED
+d$DIFF_13_12_DISCHARGES_PER_BED = d$FY2013_DISCHARGES_PER_BED - d$FY2012_DISCHARGES_PER_BED
+
+
+
+ggplot(d, aes(FY2013_DISCHARGES_PER_BED, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm') +
+  ggtitle("discharges per bed by adjusted charges")
+
+adj_model11 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY +
+                  FY2013_DISCHARGES_PER_BED +
+                  DIFF_13_12_DISCHARGES_PER_BED)
+se_adj_model11 = robust.se(adj_model11)[,2]
+
+stargazer(adj_model10, adj_model11,
+          type = "text", se = list(se_adj_model10, se_adj_model11 ))
+AIC(adj_model10, adj_model11)
+
+#jointly significant
+linearHypothesis(adj_model11, c("FY2013_DISCHARGES_PER_BED=0", "DIFF_13_12_DISCHARGES_PER_BED =0"))
+
+par(mfrow = c(2,2))
+plot(adj_model11)
+par(mfrow = c(1,1))
+```
+
+###Change in Ownership
+
+Very significant. add.
+```{r}
+#summary stats by change in ownership status
+stargazer(d %>% group_by(CHANGE_OF_OWNERSHIP_IN_PERIOD) %>%
+  summarise(count = n(),
+            avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            median = median(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
+    data.frame(), type = "text", summary = F)
+
+adj_model12 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY +
+                  FY2013_DISCHARGES_PER_BED +
+                  DIFF_13_12_DISCHARGES_PER_BED +
+                  CHANGE_OF_OWNERSHIP_IN_PERIOD)
+se_adj_model12 = robust.se(adj_model12)[,2]
+
+stargazer(adj_model11, adj_model12,
+          type = "text", se = list(se_adj_model11, se_adj_model12 ))
+AIC(adj_model11, adj_model12)
+```
+
+
+```{r}
+d$OWNERSHIP_FOR_PROFIT = ifelse(d$TYPE_OF_OWNERSHIP == 'PRIVATE FOR PROFIT',1,0)
+mean(d$OWNERSHIP_FOR_PROFIT)
+
+adj_model13 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY +
+                  FY2013_DISCHARGES_PER_BED +
+                  DIFF_13_12_DISCHARGES_PER_BED +
+                  CHANGE_OF_OWNERSHIP_IN_PERIOD +
+                  OWNERSHIP_FOR_PROFIT +
+                  OWNERSHIP_FOR_PROFIT * FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN )
+se_adj_model13 = robust.se(adj_model13)[,2]
+
+stargazer(adj_model12, adj_model13,
+          type = "text", se = list(se_adj_model12, se_adj_model13 ))
+AIC(adj_model12, adj_model13)
+
+ggplot(data = d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(OWNERSHIP_FOR_PROFIT))) + 
+  geom_point() + geom_smooth(method = 'lm') + labs(colour = "for Profit")
+
+stargazer(adj_model13,
+          type = "text", se = list(se_adj_model13 ))
+
+#compare in vs out
+adj_model13_ex = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY +
+                  FY2013_DISCHARGES_PER_BED +
+                  DIFF_13_12_DISCHARGES_PER_BED +
+                  CHANGE_OF_OWNERSHIP_IN_PERIOD +
+                  OWNERSHIP_FOR_PROFIT +
+                  OWNERSHIP_FOR_PROFIT * FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX )
+se_adj_model13_ex = robust.se(adj_model13_ex)[,2]
+
+stargazer(adj_model13,adj_model13_ex,
+          type = "text", se = list(se_adj_model13,se_adj_model13_ex ))
+
+#adjusted against unadjusted
+non_adj_model13 = lm(data = d, DIFF_14_13_AVG_CHG ~ FY2013_AVG_CHG_RELATIVE_IN +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  HRR_PERCENT_URBAN +
+                  HRR_PERCENT_RESIDENT +
+                  RESIDENCY_PROGRAM_DUMMY +
+                  HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY +
+                  FY2013_DISCHARGES_PER_BED +
+                  DIFF_13_12_DISCHARGES_PER_BED +
+                  CHANGE_OF_OWNERSHIP_IN_PERIOD +
+                  OWNERSHIP_FOR_PROFIT +
+                  OWNERSHIP_FOR_PROFIT * FY2013_AVG_CHG_RELATIVE_IN )
+se_adj_model13nonad = robust.se(non_adj_model13)[,2]
+
+stargazer(adj_model13,non_adj_model13,
+          type = "text", se = list(se_adj_model13,se_adj_model13nonad ))
 ```
