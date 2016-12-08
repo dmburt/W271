@@ -1,0 +1,213 @@
+---
+title: "W271 Lab3 - Adjusted Charges Regression"
+author: "Steve Pelkey"
+date: "December 6, 2016"
+output: html_document
+---
+```{r}
+#Initial data load and imports
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stargazer)
+library(car)
+library(lmtest)
+
+setwd("c:/Users/Steve/Documents/mids/w_271/project/W271/Data/R/")
+d <- read.delim("../../../W271_Lab3_Dataset_By_Hosp.txt")
+
+
+sapply(d, function(x) sum(is.na(x))) 
+d = d[complete.cases(d),]
+```
+
+
+##2013 Adjusted Charges
+
+The primary independent variable is the adjusted charges of a provider relative to the charges of the other providers in its HRR in 2012. Adjusting charges based on the price and complexity of a service is a standard practice in the healthcare industry designed to make comparing hospitals easier. As demonstrated by the plot below, there is a strong positive relationship between what a provider charges and its HRR (r = .73).
+
+```{r}
+# clear linear relationship between average charges of provider and its HRR
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP)) +
+  geom_point() + geom_smooth(method = 'lm') +
+  labs(x = 'Average Provider Charges ($)', 
+       y = 'Average HRR Charges ($)', 
+       title = 'Adjusted Average Adjusted Charges for Provider and Its HRR')
+
+#drop 0 values
+table(d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP == 0)
+table(d$FY2013_AVG_CHG == 0)
+d = d[ which(d$FY2013_AVG_CHG!=0 & d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP!=0), ]
+
+#correlation of .72
+cor(d$FY2013_ADJUSTED_AVG_CHG, d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP, use = "pairwise.complete.obs")
+```
+
+Despite this relationship, there is still variance in charges within an HRR. We created a variable that represents the percent of average HRR charge for each provider. Provider charges ranged from 15 to 279% of their average HRR charge, with an average of 91.3% and a standard deviation of 31 percentage points. The distribution is mostly normal (though SW test was significant), but has a slight positive skew. This will serve as a our primary independent variable as a proxy for local market competition.
+
+```{r}
+#create variable 
+d$FY2013_ADJUSTED_AVG_CHG_RELATIVE = (d$FY2013_ADJUSTED_AVG_CHG / d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP) * 100 - 100
+
+
+summary(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
+sd(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, na.rm = T)
+
+#distribution kind of normal looking. slight positive skew
+hist(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, breaks = 40)
+qqPlot(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
+shapiro.test(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE)
+```
+
+##Difference in Adjusted Charges 2013-14
+
+For the most part, adjusted charges between 2013 and 2014 did not change too dramatically. On average, adjusted charges increased by $1,052 with a standard deviation of $2,551. Notably, there are a few outliers, two of which were so extreme they had to be immediately removed. This will serve as a our dependent variable.
+```{r}
+#look at relationship between 2013 and 14 charges
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, FY2014_ADJUSTED_AVG_CHG)) + geom_point()
+
+#drop 0s
+table(d$FY2013_AVG_CHG==0)
+table(d$FY2014_AVG_CHG==0)
+d = d[ d$FY2014_AVG_CHG!=0, ]
+
+#two huge outliers
+boxplot(d$DIFF_14_13_ADJUSTED_AVG_CHG)
+
+#drop two huge outliers
+d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
+
+
+summary(d$DIFF_14_13_ADJUSTED_AVG_CHG)
+sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)
+hist(d$DIFF_14_13_ADJUSTED_AVG_CHG, breaks =40) #normalish if not for outliers
+```
+
+##Bivariate EDA
+
+In order to assess our hypothesis that local market competition is a primary driver of healthcare inflation, we examined the relationship between a provider's adjusted charges relative to its HRR in 2012 to how it set its charges for 2014 (in comparison to its 2013 charges). In a healthy market, we expect a negative relationship; those providers who were relatively costly should either increase their charges less dramatically or lower them to remain competitive in their local market. However, the scatterplot below reveals a weak positive trend (r = .06). Even though this relationship is statistically significant (p <.001) it isn't very practically significant. For every one percent increase in 2012 provider adjusted charges relative to its HRR, adjusted charges increased by just $5 from 2013 to 2014, which is just .2% of the standard deviation of the dependent variable. The tiny r2 indicates that much of the variance in 2014 adjusted charges has yet to be explained, so we added covariates to our model.
+
+```{r}
+#Weak positive relationship
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm')
+
+#Tiny correlation
+cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
+
+# Statistically, but not necessairily practically significant
+summary(lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE))
+4.666/sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)
+
+#starting model
+adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE)
+```
+
+Before adding covariates, we tried to account for local market differences in the dependent variable by comparing the difference in 13-14 adjusted charges for each provider to the average changes observed in the HRR. This did not produce very different results in a bivariate analysis, so for clarity-sake, we will stay with the original dependent variable.
+
+```{r}
+#compute 2013-14 change variable by HRR and merge with dataset
+d = d %>% group_by(HRR) %>% 
+  summarise(HRR_DIFF_14_13_ADJUSTED_AVERAGE_CHARGE = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
+  right_join(d, by = "HRR")
+d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE = d$DIFF_14_13_ADJUSTED_AVG_CHG - d$HRR_DIFF_14_13_ADJUSTED_AVERAGE_CHARGE
+
+#highly correlated with original depdendent variable
+ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE)) + 
+  geom_point() + geom_smooth(method = 'lm')
+cor(d$DIFF_14_13_ADJUSTED_AVG_CHG, d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
+
+#not much difference in bivariate model
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE)) + 
+  geom_point() + geom_smooth(method = 'lm')
+cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, d$DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
+summary(lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG_RELATIVE ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE))
+```
+
+##Building the adjusted charges model
+
+###Estimating Competitiveness of Local Markets
+
+In theory, the size of the HRR market relative to the number of providers should influence adjusted charges since a relatively crowded market should be more competitive. We used the average number of Part A beneficiaries per hospital in an HRR as a proxy for this phenomenon. Indeed, we observed a positive relationship in bivariate analysis that was preserved when added to the regression, and is statistically and practically significant. There is a $31.75 dollar increase for every 1,000 Part A beneficiaries per provider in an HRR. Thus, this will remain in our model.
+
+```{r}
+d$BENEFICIARIES_PER_PROVIDER = d$PART_A_BENEFICIARIES/d$N_HOSPS_IN_HRR/1000 #in thousands
+hist(d$BENEFICIARIES_PER_PROVIDER, breaks = 20)
+summary(d$BENEFICIARIES_PER_PROVIDER)
+
+#slight positive relationship with dependent variable
+ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm')
+cor(d$BENEFICIARIES_PER_PROVIDER, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
+
+#a bit higher positive relationship with independent variable
+ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, FY2013_ADJUSTED_AVG_CHG_RELATIVE)) + 
+  geom_point() + geom_smooth(method = 'lm')
+cor(d$BENEFICIARIES_PER_PROVIDER, d$FY2013_ADJUSTED_AVG_CHG_RELATIVE, use = "pairwise.complete.obs")
+
+#add to model. Slight improvement
+adj_model1 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+                  BENEFICIARIES_PER_PROVIDER)
+stargazer(adj_model0,adj_model1, type = "text" )
+AIC(adj_model0,adj_model1)
+```
+###Bed Count
+
+Bed count is a proxy for the size of the provider. While we expect it to be positively correlated with average number of Part A beneficiaries per provider (r = .16), a good part of the variation in this correlation represents the fact that there are major discrepancies in provider size within HRRs. This discrepancy is likely a factor in local market competition when providers are setting charges. After computing the size of a provider relative to its HRR and entering this variable into the model, we found that the AIC dropped and R2 increased considerably. Furthermore, adding in this variable greatly reduced the coefficient of our primary independent variable, which is no longer statistically significant.
+
+```{r}
+
+
+
+#Provider (bed count) vs HRR (Part A beneficiaries) Size
+ggplot(d, aes(BED_CNT, BENEFICIARIES_PER_PROVIDER)) + 
+  geom_point() + geom_smooth(method = 'lm') +
+  ggtitle("Bed Count by Average Beneficiaries per Provider")
+cor(d$BED_CNT, d$BENEFICIARIES_PER_PROVIDER, use = "pairwise.complete.obs")
+
+#standard deviation of bed count per HRR summarized
+summary(d$BED_CNT)
+stargazer(d %>% group_by(HRR) %>% 
+  summarise(Within_HRR_BED_COUNT_STDV = sd(BED_CNT, na.rm = T)) %>% data.frame(), type = "text")
+
+#Relative size of provider within a market
+d$BED_CNT_PER_THOUSAND_BENEFICIARIES = d$BED_CNT/d$BENEFICIARIES_PER_PROVIDER
+
+adj_model2 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES)
+stargazer(adj_model1,adj_model2, type = "text" )
+AIC(adj_model1,adj_model2)
+
+
+
+```
+
+
+###Urban vs Rural
+
+On average, urban providers increased their charges at nearly twice the rate of rural providers between 2013 and 2014. We added this indicator variable to the model to account for some of the (huge) variance still left. It is statistically and practically signficant.
+
+```{r}
+#summary stats by rural/urban
+stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
+  summarise(avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            median = median(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
+    data.frame(), type = "text", summary = F)
+
+#density plot. massive overlap between rural and urban
+ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = URBAN_RURAL_IND, colour = URBAN_RURAL_IND)) + 
+  geom_density(alpha = .1)
+
+adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE +
+                  BENEFICIARIES_PER_PROVIDER + 
+                  BED_CNT_PER_THOUSAND_BENEFICIARIES +
+                  URBAN_RURAL_IND)
+stargazer(adj_model3,adj_model2, type = "text" )
+AIC(adj_model3,adj_model2)
+
+```
+
