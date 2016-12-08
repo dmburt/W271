@@ -25,6 +25,13 @@ d$N_PROVIDERS = d$N_NURSES + d$N_PHYSICIANS
 d$BENEFICIARIES_PER_PROVIDER = d$PART_A_BENEFICIARIES/d$N_HOSPS_IN_HRR/1000
 d$BED_CNT_PER_THOUSAND_BENEFICIARIES = d$BED_CNT/d$BENEFICIARIES_PER_PROVIDER
 
+d$urban_dummy = ifelse(d$URBAN_RURAL_IND =='U',1,0)
+d$RESIDENCY_PROGRAM_DUMMY = ifelse(d$RESIDENCY_PROGRAM_IND=='Y',1,0)
+d = d %>% group_by(HRR) %>% 
+  summarise(HRR_PERCENT_URBAN = mean(urban_dummy, na.rm =T)*100,
+            HRR_PERCENT_RESIDENT = mean(RESIDENCY_PROGRAM_DUMMY, na.rm = T)*100) %>%
+  right_join(d, by = 'HRR')
+
 # Checking for missing values
 sapply(d, function(x) sum(is.na(x))) # only missing values are in bed count; how do we want to deal with these?
 d = d[complete.cases(d),]
