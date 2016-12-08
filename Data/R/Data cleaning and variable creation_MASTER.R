@@ -38,3 +38,22 @@ d = d[complete.cases(d),]
 
 # Removing big outliers due to ungroupable DRG's
 d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
+  
+# d is the final, clean dataframe for the main analysis
+
+# Preparing dataframes for split analyses
+
+# Splitting data by over/under inflation
+# Calculate inflation
+d$INFLATION_2014 <- ((d$FY2014_AVG_CHG - d$FY2013_AVG_CHG)/d$FY2013_AVG_CHG)*100
+summary(d$INFLATION_2014)
+d$INFLATION_ADJUSTED_2014 <- ((d$FY2014_ADJUSTED_AVG_CHG - d$FY2013_ADJUSTED_AVG_CHG)/d$FY2013_ADJUSTED_AVG_CHG)*100
+summary(d$INFLATION_ADJUSTED_2014)
+# Split data by greater/less than 2.0% (is this the right inflation rate to use?)
+inflation_over <- d[d$INFLATION_2014 >2.0,]
+inflation_under <- d[d$INFLATION_2014 <= 2.0,]
+
+# Splitting data by over/under HRR (adjusted, excluding)
+hrr_over <- d[d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX > 0,]
+hrr_under <- d[d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX <= 0,]
+
