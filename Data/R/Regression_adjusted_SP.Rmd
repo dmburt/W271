@@ -13,58 +13,76 @@ library(stargazer)
 library(car)
 library(lmtest)
 library(ivpack)
+library(effects)
 
 
 setwd("c:/Users/Steve/Documents/mids/w_271/project/W271/Data/R/")
 d <- read.delim("../../../W271_Lab3_Dataset_By_Hosp.txt")
-
-
-sapply(d, function(x) sum(is.na(x))) 
-d = d[complete.cases(d),]
 ```
 
 
 ##2013 Adjusted Charges
 
-The primary independent variable is the adjusted charges of a provider relative to the charges of the other providers in its HRR in 2012. Adjusting charges based on the price and complexity of a service is a standard practice in the healthcare industry designed to make comparing hospitals easier. As demonstrated by the plot below, there is a strong positive relationship between what a provider charges and its HRR (r = .73).
+The primary independent variable is the adjusted charges of a provider relative to the charges of the other providers in its HRR in 2013. Adjusting charges based on the price and complexity of a service is a standard practice in the healthcare industry designed to make comparing hospitals easier. As demonstrated by the plot below, there is a strong positive relationship between what a provider charges and its competitors (r = .66).
 
 ```{r}
-# clear linear relationship between average charges of provider and its HRR
-ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP)) +
+# clear linear relationship between average charges of provider and its competitors
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, HRR_FY2013_ADJUSTED_AVG_CHG_EXCLUDING_HOSP)) +
   geom_point() + geom_smooth(method = 'lm') +
   labs(x = 'Average Provider Charges ($)', 
-       y = 'Average HRR Charges ($)', 
+       y = 'Average Charges of Competitors($)', 
        title = 'Adjusted Average Adjusted Charges for Provider and Its HRR')
 
-#correlation of .72
-cor(d$FY2013_ADJUSTED_AVG_CHG, d$HRR_FY2013_ADJUSTED_AVG_CHG_INCLUDING_HOSP, use = "pairwise.complete.obs")
+#correlation of .66
+cor(d$FY2013_ADJUSTED_AVG_CHG, d$HRR_FY2013_ADJUSTED_AVG_CHG_EXCLUDING_HOSP, use = "pairwise.complete.obs")
 ```
 
-Despite this relationship, there is still variance in charges within an HRR. We created a variable that represents the percent of average HRR charge for each provider. Provider charges ranged from 15 to 279% of their average HRR charge, with an average of 91.3% and a standard deviation of 31 percentage points. The distribution is mostly normal (though SW test was significant), but has a slight positive skew. This will serve as a our primary independent variable as a proxy for local market competition.
+Despite this relationship, there is still a lot variance in charges within an HRR. Provider charges ranged from -85 to 208% of their average HRR charge, with an average of -7.071% and a standard deviation of 36 percentage points. The distribution is mostly normal, but has a positive skew, which statistically deviates from normality (W =.96, p < .001) This will serve as a our primary independent variable as a proxy for local market competition.
 
 ```{r}
-summary(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
-sd(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, na.rm = T)
+stargazer(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX %>% data.frame(),
+          type = "text", iqr = T, median = T,
+          title = "Provider Adjusted Charges Relative to Competitors, 2013")
 
+#asses distribution
 #distribution kind of normal looking. slight positive skew
-hist(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, breaks = 40)
-qqPlot(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
-shapiro.test(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
+par(mfrow=c(1,2))
+hist(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX, breaks = 40,
+     main = "Charges as Percent of Competitors")
+qqPlot(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX)
+par(mfrow=c(1,1))
+shapiro.test(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX)
 ```
 
 ##Difference in Adjusted Charges 2013-14
 
-For the most part, adjusted charges between 2013 and 2014 did not change too dramatically. On average, adjusted charges increased by $1,052 with a standard deviation of $2,551. Notably, there are a few outliers, two of which were so extreme they had to be immediately removed. This will serve as a our dependent variable.
+For the most part, adjusted charges between 2013 and 2014 did not change too dramatically. On average, adjusted charges increased by $1,054 with a standard deviation of $2,548. Notably, there are a few outliers on either side of the distribution, which makes it leptokurtic This will serve as a our dependent variable.
 ```{r}
 #look at relationship between 2013 and 14 charges
-ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, FY2014_ADJUSTED_AVG_CHG)) + geom_point()
 
-#two huge outliers
-boxplot(d$DIFF_14_13_ADJUSTED_AVG_CHG)
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG, FY2014_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm') +
+  labs(x = "2013 Adjusted Average Charge", y = "2014 Adjusted Average Charge") +
+  ggtitle("Provider Adjusted Average Charges, 2013 by 2014")
 
-summary(d$DIFF_14_13_ADJUSTED_AVG_CHG)
-sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)
-hist(d$DIFF_14_13_ADJUSTED_AVG_CHG, breaks =40) #normalish if not for outliers
+#.99 correlation
+cor(d$FY2013_ADJUSTED_AVG_CHG, d$FY2014_ADJUSTED_AVG_CHG)
+
+#summarise change variable
+stargazer(d$DIFF_14_13_ADJUSTED_AVG_CHG %>% data.frame(),
+          type = "text", iqr = T, median = T,
+          title = "Charge in Provider Charges, 2013-2014")
+
+#asses distribution
+#distribution leptokurtic
+par(mfrow=c(1,2))
+hist(d$DIFF_14_13_ADJUSTED_AVG_CHG, breaks = 40,
+     main = "Charge in Provider Charges, 2013-2014")
+qqPlot(d$DIFF_14_13_ADJUSTED_AVG_CHG)
+par(mfrow=c(1,1))
+
+shapiro.test(d$DIFF_14_13_ADJUSTED_AVG_CHG)
+
 ```
 
 ##Bivariate EDA
@@ -73,39 +91,45 @@ In order to assess our hypothesis that local market competition is a primary dri
 
 ```{r}
 #Weak positive relationship
-ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
-  geom_point() + geom_smooth(method = 'lm')
+ggplot(d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm') +
+  ggtitle("Increase in Provider Charge in 2014 by Relative 2013 Charge") +
+  labs(x = "2013 Average Charge Relative to Competition (Percent)", y = "Difference in Charge, 2013 - 14")
 
 #Tiny correlation
-cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
+cor(d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
 
-# Statistically, but not necessairily practically significant
-adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
-stargazer(adj_model0, type = "text")
+# Statistically significant
+adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX)
+stargazer(adj_model0, 
+          type = "text",
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "Bivariate Model",
+          covariate.labels = c("Average Relative Charge, 2013"))
+
+# Not hugely practically significant
+# coefficient is .24% of one sd of dependent variable
 adj_model0$coefficients[2]/sd(d$DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T) * 100
 
 hist(adj_model0$residuals, breaks = 50)
-plot(adj_model0$fitted.values, adj_model0$residuals, 
-     xlab = "Fitted values", ylab = "Residuals", 
-     main = "Residuals vs Fitted") 
+
+#diagnostic plots. heteroskedasticity might be a problem
 par(mfrow = c(2,2))
 plot(adj_model0)
 par(mfrow = c(1,1))
 
-#drop two huge outliers outside of cook's distance
-d = d[which(d$DIFF_14_13_ADJUSTED_AVG_CHG < 79000 & d$DIFF_14_13_ADJUSTED_AVG_CHG > -33000),]
+#just significant
+bptest(adj_model0)
 
-
-adj_model0 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)
-
-par(mfrow = c(2,2))
-plot(adj_model0)
-par(mfrow = c(1,1))
-
+#use robust SEs just to be safe
 se_adj_model0 = robust.se(adj_model0)[,2]
+
 stargazer(adj_model0, 
-          type = "text"
-          , se = list(se_adj_model0 ))
+          type = "text",
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "Bivariate Model",
+          covariate.labels = c("Average Relative Charge, 2013"),
+          se = list(se_adj_model0 ))
 ```
 
 ##Building the adjusted charges model
@@ -115,67 +139,81 @@ stargazer(adj_model0,
 In theory, the size of the HRR market relative to the number of providers should influence adjusted charges since a relatively crowded market should be more competitive. We used the average number of Part A beneficiaries per hospital in an HRR as a proxy for this phenomenon. Indeed, we observed a positive relationship in bivariate analysis that was preserved when added to the regression, and is statistically and practically significant. There is a $31.75 dollar increase for every 1,000 Part A beneficiaries per provider in an HRR. Thus, this will remain in our model.
 
 ```{r}
+stargazer(d$BENEFICIARIES_PER_PROVIDER %>% data.frame(),
+          type = "text", iqr = T, median = T,
+          title = "Part A Beneficiaries per Provider")
+
+#distribution
+par(mfrow = c(1,2))
 hist(d$BENEFICIARIES_PER_PROVIDER, breaks = 20)
-summary(d$BENEFICIARIES_PER_PROVIDER)
+qqPlot(d$BENEFICIARIES_PER_PROVIDER)
+par(mfrow = c(1,1))
 
 #slight positive relationship with dependent variable
 ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
-  geom_point() + geom_smooth(method = 'lm')
+  geom_point() + geom_smooth(method = 'lm') +
+  ggtitle("Beneficiaries per Provider by Difference in Adjusted Charges, 2013-14") +
+  labs(x = "Beneficiaries per Provider", y = "Difference in Adjusted Average Charge, 2013-14")
 cor(d$BENEFICIARIES_PER_PROVIDER, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
 
-#a bit higher positive relationship with independent variable
-ggplot(d, aes(BENEFICIARIES_PER_PROVIDER, FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN)) + 
-  geom_point() + geom_smooth(method = 'lm')
-cor(d$BENEFICIARIES_PER_PROVIDER, d$FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, use = "pairwise.complete.obs")
-
 #add to model. Slight improvement
-adj_model1 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model1 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER)
-
-par(mfrow = c(2,2))
-plot(adj_model1)
-par(mfrow = c(1,1))
 
 se_adj_model1 = robust.se(adj_model1)[,2]
 
 stargazer(adj_model0, adj_model1,
-          type = "text"
-          , se = list(se_adj_model0, se_adj_model1 ))
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Beneficiaries per Provider",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)"),
+          se = list(se_adj_model0, se_adj_model1 ))
 AIC(adj_model0,adj_model1)
 
 ```
 
-###Bed Count
+###Bed Count Per Thousand Beneficiary
 
 Bed count is a proxy for the size of the provider. While we expect it to be positively correlated with average number of Part A beneficiaries per provider (r = .16), a good part of the variation in this correlation represents the fact that there are major discrepancies in provider size within HRRs. This discrepancy is likely a factor in local market competition when providers are setting charges. After computing the size of a provider relative to its HRR and entering this variable into the model, we found that the AIC dropped and R2 increased considerably. Furthermore, adding in this variable greatly reduced the coefficient of our primary independent variable, which is no longer statistically significant.
 
 ```{r}
-#Provider (bed count) vs HRR (Part A beneficiaries) Size
-ggplot(d, aes(BED_CNT, BENEFICIARIES_PER_PROVIDER)) + 
+#summary stats
+stargazer(d$BED_CNT_PER_THOUSAND_BENEFICIARIES %>% data.frame(),
+          type = "text", iqr = T, median = T,
+          title = "Bed Count per Thousand Part A Beneficiaries")
+
+#distribution
+#Poisson-esque
+par(mfrow = c(1,2))
+hist(d$BED_CNT_PER_THOUSAND_BENEFICIARIES, breaks = 20,
+     main = "Bed Count per Thousand Part A Beneficiaries")
+qqPlot(d$BED_CNT_PER_THOUSAND_BENEFICIARIES)
+par(mfrow = c(1,1))
+
+#slight positive relationship with dependent variable
+ggplot(d, aes(BED_CNT_PER_THOUSAND_BENEFICIARIES, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
   geom_point() + geom_smooth(method = 'lm') +
-  ggtitle("Bed Count by Average Beneficiaries per Provider")
-cor(d$BED_CNT, d$BENEFICIARIES_PER_PROVIDER, use = "pairwise.complete.obs")
+  ggtitle("Bed Count per Thousand Part A Beneficiaries by Difference in Adjusted Charges, 2013-14") +
+  labs(x = "Bed Count per Thousand Part A Beneficiaries", y = "Difference in Adjusted Average Charge, 2013-14")
+cor(d$BED_CNT_PER_THOUSAND_BENEFICIARIES, d$DIFF_14_13_ADJUSTED_AVG_CHG, use = "pairwise.complete.obs")
 
-#standard deviation of bed count per HRR summarized
-summary(d$BED_CNT)
-stargazer(d %>% group_by(HRR) %>% 
-  summarise(Within_HRR_BED_COUNT_STDV = sd(BED_CNT, na.rm = T)) %>% data.frame(), type = "text")
-
-adj_model2 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+#add to model
+adj_model2 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES)
 
-
-par(mfrow = c(2,2))
-plot(adj_model2)
-par(mfrow = c(1,1))
-
 se_adj_model2 = robust.se(adj_model2)[,2]
 
-stargazer(adj_model0, adj_model1,adj_model2,
-          type = "text"
-          , se = list(se_adj_model0, se_adj_model1, se_adj_model2 ))
-AIC(adj_model0,adj_model1,adj_model2)
+stargazer(adj_model1,adj_model2,
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Beds per Thousand Part A Beneficiaries",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries"),
+          se = list(se_adj_model1, se_adj_model2 ))
+AIC(adj_model1,adj_model2)
 
 ```
 
@@ -196,20 +234,29 @@ stargazer(d %>% group_by(URBAN_RURAL_IND) %>%
             stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
-    data.frame(), type = "text", summary = F)
+    data.frame(), type = "text", summary = F, 
+  title = "Difference in Adjusted Average Charge, 2013-14 by Urban/Rural" )
 
 #density plot. massive overlap between rural and urban
 ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = URBAN_RURAL_IND, colour = URBAN_RURAL_IND)) + 
-  geom_density(alpha = .1)
+  geom_density(alpha = .1) +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14 by Urban/Rural") +
+  labs(x = "Difference in Adjusted Average Charge, 2013-14")
 
+#Provider Status and Percent urban in HRR
 #huge variability in the 100% urban section
+#possible interaction
 ggplot(data = d, aes(HRR_PERCENT_URBAN, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(URBAN_RURAL_IND))) + 
-  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Provider \nU/R Status")
+  geom_point() + geom_smooth(method = 'lm') + 
+  labs(colour = "Provider \nU/R Status", 
+         x ="Percent of HRR that is Urban",
+         y = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14\n by Urban/Rural Status and Percent of HRR That is Urban")
 cor(d$HRR_PERCENT_URBAN,d$DIFF_14_13_ADJUSTED_AVG_CHG)
 
 #compare models
 #provider urban/rural status
-adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model3 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   urban_dummy)
@@ -218,14 +265,14 @@ se_adj_model3 = robust.se(adj_model3)[,2]
 
 
 #percent of HRR that is urban instead
-adj_model4 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model4 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN)
 se_adj_model4 = robust.se(adj_model4)[,2]
 
 #both urban/rural variables
-adj_model5 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model5 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   urban_dummy +
@@ -233,25 +280,28 @@ adj_model5 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_
 se_adj_model5 = robust.se(adj_model5)[,2]
 
 #both urban/rural variables with interaction
-adj_model6 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model6 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   urban_dummy +
                   HRR_PERCENT_URBAN +
                   urban_dummy * HRR_PERCENT_URBAN)
 se_adj_model6 = robust.se(adj_model6)[,2]
-robust.se(adj_model6)
+
 stargazer(adj_model3, adj_model4,adj_model5,adj_model6,
-          type = "text"
-          , se = list( se_adj_model3, se_adj_model4,se_adj_model5,se_adj_model6  ))
+          type = "text",
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Urban/Rural Variables",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Urban Provider",
+                               "Percent of HRR that is Urban",
+                               "Urban by Percent Urban Interaction"),
+          se = list( se_adj_model3, se_adj_model4,se_adj_model5,se_adj_model6  ))
 AIC(adj_model3, adj_model4,adj_model5,adj_model6 )
 
-par(mfrow = c(2,2))
-plot(adj_model3)
-plot(adj_model4)
-plot(adj_model5)
-plot(adj_model6)
-par(mfrow = c(1,1))
+
 ```
 
 ###Residency
@@ -267,20 +317,26 @@ stargazer(d %>% group_by(RESIDENCY_PROGRAM_IND) %>%
             stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
-    data.frame(), type = "text", summary = F)
+    data.frame(), type = "text", summary = F, 
+  title = "Providers With/Out Residency Programs")
 
 #density plot
 ggplot(d, aes(DIFF_14_13_ADJUSTED_AVG_CHG, fill = RESIDENCY_PROGRAM_IND, colour = RESIDENCY_PROGRAM_IND)) + 
-  geom_density(alpha = .1)
+  geom_density(alpha = .1) + 
+  labs(x = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14\n by Provider Residency Status")
 
-#same trend as urban/rural, though interaction effect looks potentially bigger
+#same trend as urban/rural, though interaction effect looks potentially significant
+#providers who are the only 
 ggplot(data = d, aes(HRR_PERCENT_RESIDENT, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(RESIDENCY_PROGRAM_DUMMY))) + 
-  geom_point() + geom_smooth(method = 'lm') + labs(colour = "Residency")
+  geom_point() + geom_smooth(method = 'lm') + 
+  labs(colour = "Residency", x = "Percent of HRR that Has Residency Program", y = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14\n by Residency Status and Percent of HRR That has Resident Program")
 cor(d$HRR_PERCENT_RESIDENT,d$DIFF_14_13_ADJUSTED_AVG_CHG)
 
 #compare models
 #just provider residency status
-adj_model7 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model7 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -288,7 +344,7 @@ adj_model7 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_
 se_adj_model7 = robust.se(adj_model7)[,2]
 
 #just percent residency
-adj_model8 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model8 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -296,7 +352,7 @@ adj_model8 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_
 se_adj_model8 = robust.se(adj_model8)[,2]
 
 #both provider residency status and percent residency
-adj_model9 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model9 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -305,7 +361,7 @@ adj_model9 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_
 se_adj_model9 = robust.se(adj_model9)[,2]
 
 #add interaction
-adj_model10 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model10 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -314,35 +370,45 @@ adj_model10 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG
                   HRR_PERCENT_RESIDENT * RESIDENCY_PROGRAM_DUMMY)
 se_adj_model10 = robust.se(adj_model10)[,2]
 
-stargazer(adj_model4, adj_model7, adj_model8,adj_model9,adj_model10,
-          type = "text"
-          , se = list(se_adj_model4, se_adj_model7, se_adj_model8,se_adj_model9, se_adj_model10))
+stargazer(adj_model7, adj_model8,adj_model9,adj_model10,
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Urban/Rural Variables",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Has Residency Program",
+                               "Provider Residency by Percent of HRR w Residency",
+                               "Percent of HRR with Residency Programs"),
+          se = list(se_adj_model7, se_adj_model8,se_adj_model9, se_adj_model10))
 AIC(adj_model4, adj_model7, adj_model8,adj_model9,adj_model10 )
 
-
+#new model is significantly better
 linearHypothesis(adj_model10, c("HRR_PERCENT_RESIDENT=0", "RESIDENCY_PROGRAM_DUMMY =0","HRR_PERCENT_RESIDENT:RESIDENCY_PROGRAM_DUMMY=0"))
 
 ```
 
-###Discharges per bed count
+###Discharges per bed count/Health of Provider
 
-Proxy for business. 
+Discharges per bed is a proxy for the health of provider (pun intended). More discharges per bed means that a hospital is doing better business relative to its capacity. We used two variables for discharges per bed count. 1) 2013 discharges per bed gauges the health of provider against other providers, 2) the difference in discharges between 2013 and 2012 gauges the health of a provider relative to itself. These are jointly significant.
 
 ```{r}
-d$FY2012_DISCHARGES_PER_BED = d$N_FY2012_DISCHARGES/d$BED_CNT
-d$FY2013_DISCHARGES_PER_BED = d$N_FY2013_DISCHARGES/d$BED_CNT
-#d$FY2014_DISCHARGES_PER_BED = d$N_FY2014_DISCHARGES/d$BED_CNT
-
-#d$DIFF_14_13_DISCHARGES_PER_BED = d$FY2014_DISCHARGES_PER_BED - d$FY2013_DISCHARGES_PER_BED
-d$DIFF_13_12_DISCHARGES_PER_BED = d$FY2013_DISCHARGES_PER_BED - d$FY2012_DISCHARGES_PER_BED
-
-
-
+#2013 discharges
+#potential outlier situation. see what it looks like in final model
 ggplot(d, aes(FY2013_DISCHARGES_PER_BED, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
   geom_point() + geom_smooth(method = 'lm') +
-  ggtitle("discharges per bed by adjusted charges")
+  labs(x = "2013 Discharges per Bed", y = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14\n by Number of Discharges per Bed, 2013")
 
-adj_model11 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+#change in discharges, 2012-13 
+#potential outlier situation. see what it looks like in final model
+ggplot(d, aes(DIFF_13_12_DISCHARGES_PER_BED, DIFF_14_13_ADJUSTED_AVG_CHG)) + 
+  geom_point() + geom_smooth(method = 'lm') +
+  labs(x = "Difference in Discharges per Bed,2012-13", y = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Difference in Adjusted Average Charge, 2013-14\n by Difference in Discharges per Bed, 2012-13")
+
+adj_model11 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -354,20 +420,29 @@ adj_model11 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG
 se_adj_model11 = robust.se(adj_model11)[,2]
 
 stargazer(adj_model10, adj_model11,
-          type = "text", se = list(se_adj_model10, se_adj_model11 ))
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Discharges per Bed",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Provider Residency by Percent of HRR w Residency"),
+          se = list(se_adj_model10, se_adj_model11 ))
 AIC(adj_model10, adj_model11)
 
 #jointly significant
 linearHypothesis(adj_model11, c("FY2013_DISCHARGES_PER_BED=0", "DIFF_13_12_DISCHARGES_PER_BED =0"))
 
-par(mfrow = c(2,2))
-plot(adj_model11)
-par(mfrow = c(1,1))
 ```
 
 ###Change in Ownership
 
-Very significant. add.
+Did provider go through a change in ownership. Very significant, statistically and practically so. 
 ```{r}
 #summary stats by change in ownership status
 stargazer(d %>% group_by(CHANGE_OF_OWNERSHIP_IN_PERIOD) %>%
@@ -377,9 +452,10 @@ stargazer(d %>% group_by(CHANGE_OF_OWNERSHIP_IN_PERIOD) %>%
             stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
             max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
-    data.frame(), type = "text", summary = F)
+    data.frame(), type = "text", 
+  title = "Change in Ownership?",summary = F)
 
-adj_model12 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+adj_model12 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -392,16 +468,41 @@ adj_model12 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG
 se_adj_model12 = robust.se(adj_model12)[,2]
 
 stargazer(adj_model11, adj_model12,
-          type = "text", se = list(se_adj_model11, se_adj_model12 ))
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Change in Ownership",
+          covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Underwent Change in Management",
+                               "Provider Residency by Percent of HRR w Residency"),
+          se = list(se_adj_model11, se_adj_model12 ))
 AIC(adj_model11, adj_model12)
 ```
 
-
+Is a provider a private for profit? 
 ```{r}
-d$OWNERSHIP_FOR_PROFIT = ifelse(d$TYPE_OF_OWNERSHIP == 'PRIVATE FOR PROFIT',1,0)
+#21% of providers are private for profits
 mean(d$OWNERSHIP_FOR_PROFIT)
 
-adj_model13 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN +
+#summary stats by change in ownership status
+stargazer(d %>% group_by(OWNERSHIP_FOR_PROFIT) %>%
+  summarise(count = n(),
+            avg = mean(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            median = median(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            stdv = sd(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            min = min(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T),
+            max = max(DIFF_14_13_ADJUSTED_AVG_CHG, na.rm = T)) %>%
+    data.frame(), type = "text", 
+  title = "Private, For Profit Provider",summary = F)
+
+#add ownership type
+adj_model13 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -411,22 +512,37 @@ adj_model13 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG
                   FY2013_DISCHARGES_PER_BED +
                   DIFF_13_12_DISCHARGES_PER_BED +
                   CHANGE_OF_OWNERSHIP_IN_PERIOD +
-                  OWNERSHIP_FOR_PROFIT +
-                  OWNERSHIP_FOR_PROFIT * FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN )
+                  OWNERSHIP_FOR_PROFIT )
 se_adj_model13 = robust.se(adj_model13)[,2]
 
+#sucked all significance from primary independent variable
 stargazer(adj_model12, adj_model13,
-          type = "text", se = list(se_adj_model12, se_adj_model13 ))
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Ownership Type",
+                    covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Underwent Change in Management",
+                               "Is Private, For Profit",
+                               "Provider Residency by Percent of HRR w Residency"),
+          se = list(se_adj_model12, se_adj_model13 ))
 AIC(adj_model12, adj_model13)
 
-ggplot(data = d, aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_IN, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(OWNERSHIP_FOR_PROFIT))) + 
-  geom_point() + geom_smooth(method = 'lm') + labs(colour = "for Profit")
+#interaction effect with primary independent variable?
+ggplot(data = d, 
+       aes(FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX, DIFF_14_13_ADJUSTED_AVG_CHG, colour = factor(OWNERSHIP_FOR_PROFIT))) + 
+  geom_point() + geom_smooth(method = 'lm') + 
+  labs(colour = "Private\nfor Profit?", x = "Average Relative Charge, 2013", y = "Difference in Adjusted Average Charge, 2013-14") +
+  ggtitle("Average Relative Charge, 2013 by Difference in Adjusted Average Charge, 2013-14 \n by Ownership Type")
 
-stargazer(adj_model13,
-          type = "text", se = list(se_adj_model13 ))
-
-#compare in vs out
-adj_model13_ex = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
+#add interaction effect
+adj_model14 = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -438,13 +554,62 @@ adj_model13_ex = lm(data = d, DIFF_14_13_ADJUSTED_AVG_CHG ~ FY2013_ADJUSTED_AVG_
                   CHANGE_OF_OWNERSHIP_IN_PERIOD +
                   OWNERSHIP_FOR_PROFIT +
                   OWNERSHIP_FOR_PROFIT * FY2013_ADJUSTED_AVG_CHG_RELATIVE_EX )
-se_adj_model13_ex = robust.se(adj_model13_ex)[,2]
+se_adj_model14 = robust.se(adj_model14)[,2]
 
-stargazer(adj_model13,adj_model13_ex,
-          type = "text", se = list(se_adj_model13,se_adj_model13_ex ))
+stargazer(adj_model12, adj_model13, adj_model14,
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "With Ownership Type, Relative Charge Interaction",
+                    covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Underwent Change in Management",
+                               "Is Private, For Profit",
+                               "Provider Residency by Percent of HRR w Residency",
+                               "For Profit by 2013 Relative Charge"),
+          se = list(se_adj_model12, se_adj_model13, se_adj_model14 ))
+AIC(adj_model12, adj_model13, adj_model14)
 
-#adjusted against unadjusted
-non_adj_model13 = lm(data = d, DIFF_14_13_AVG_CHG ~ FY2013_AVG_CHG_RELATIVE_IN +
+```
+
+Final model for nonsplit sample.
+
+```{r}
+overall_model = adj_model14
+se_overall_model = se_adj_model14
+
+stargazer(overall_model,
+          type = "text", 
+          dep.var.labels = "Difference in Adjusted Average Charge, 2013-14",
+          title = "Final Overall Model",
+                    covariate.labels = c("Average Relative Charge, 2013", 
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Underwent Change in Management",
+                               "Is Private, For Profit",
+                               "Provider Residency by Percent of HRR w Residency",
+                               "For Profit by 2013 Relative Charge"),
+          se = list(se_overall_model))
+stargazer(adj_model14,
+          type = "text", se = list(se_adj_model13 ))
+```
+
+Adjusted vs non adjusted dollars. Most important effect is that the primary independent variable remained significant with unadjusted dollars.
+
+```{r}
+
+#use unadjusted dollars
+non_adj_model = lm(data = d, DIFF_14_13_AVG_CHG ~ FY2013_AVG_CHG_RELATIVE_EX +
                   BENEFICIARIES_PER_PROVIDER + 
                   BED_CNT_PER_THOUSAND_BENEFICIARIES +
                   HRR_PERCENT_URBAN +
@@ -455,9 +620,27 @@ non_adj_model13 = lm(data = d, DIFF_14_13_AVG_CHG ~ FY2013_AVG_CHG_RELATIVE_IN +
                   DIFF_13_12_DISCHARGES_PER_BED +
                   CHANGE_OF_OWNERSHIP_IN_PERIOD +
                   OWNERSHIP_FOR_PROFIT +
-                  OWNERSHIP_FOR_PROFIT * FY2013_AVG_CHG_RELATIVE_IN )
-se_adj_model13nonad = robust.se(non_adj_model13)[,2]
+                  OWNERSHIP_FOR_PROFIT * FY2013_AVG_CHG_RELATIVE_EX )
+se_adj_modelnonad = robust.se(non_adj_model)[,2]
 
-stargazer(adj_model13,non_adj_model13,
-          type = "text", se = list(se_adj_model13,se_adj_model13nonad ))
+stargazer(overall_model,non_adj_model,
+          type = "text", 
+          dep.var.labels = c("Adjusted", "Non Adjusted"),
+          title = "Adjusted vs Unadjusted Dollars",
+                    covariate.labels = c("Average Relative Charge (Adjusted), 2013", 
+                               "Average Relative Charge (Unadjusted), 2013",
+                               "Avg Number of Beneficiaries per Provider (thousands)",
+                               "Beds per Thousand Beneficiaries",
+                               "Percent of HRR that is Urban",
+                               "Percent of HRR with Residency Programs",
+                               "Has Residency Program",
+                               "Discharges per Bed, 2013",
+                               "Discharges per bed, Change from 2012-13",
+                               "Underwent Change in Management",
+                               "Is Private, For Profit",
+                               "Provider Residency by Percent of HRR w Residency",
+                               "For Profit by 2013 Relative Charge (Adjusted)",
+                               "For Profit by 2013 Relative Charge (Unadjusted)"),
+          se = list(se_overall_model,se_adj_modelnonad ))
+
 ```
