@@ -1,0 +1,53 @@
+---
+title: "Assumptions and Diagnostics"
+author: "Steve Pelkey"
+date: "December 9, 2016"
+output: html_document
+---
+
+##Model and CLM Assumptions
+
+Since reporting is required by federal regulation, the random sampling assumption is moot. However, this model likely suffers from ommitted variable bias because only 5% of the variance is explained. For the most part, our hypothesis was rejected, and we still don't have a great idea of what drives provider charges even if we found some interesting relationships. 
+
+The overall model is heteroskedastic (BP(12) = 180, p < .001); moreover, when we plotted the residuals against each of the predictors, almost all of the plots look like they violate the homoskedasticity assumption. After performing the EDA, we anticipated this to be a problem, so we used robust standard errors from the start of the model building process. Furthermore, each of these scatterplots show that the mean residual value is approximately 0 for all values of x, so we can infer that linearity is a reasonable assumption. There is an occasional deviation, but these are often caused by just a handful of values.
+
+As expected with a panel dataset and demonstrated by the ACF graph, there is no autocorrelation in the error term. Also, none of the predictors are very highly correlated (see correlation matrix), so the no multicolinearity assumption is met.
+
+The model residuals clearly violate the normality assumption (W = .85, p < .001) since the distribution is very leptokurtic. Substantial outliers have plagued this analysis from the beginning due to the massive variation in almost all of the variables in the data set. We tried transforming a few variables and dropped a few egregious outliers during EDA, but the problem persisted. Moreover, it is impossible to tell whether the outliers actually reflect the underlying population or are a result of reporting error. However, the Residuals vs Leverage plot demonstrates that none of the outliers passed Cook's distance in the overall model, and thus are not exerting undue influence. Nonetheless, it might be worth pursuing nonparametric methods in future research. 
+
+```{r}
+#primary diagnostic plots
+par(mfrow = c(2,2))
+plot(overall_model)
+par(mfrow = c(1,1))
+
+#plot fitted vs residuals
+scatterplot(overall_model$fitted.values, overall_model$residuals,
+            ylab = "Residuals", xlab = "Fitted Values", main = "Residuals vs Fitted Values")
+#bp test
+bptest(overall_model)
+
+#plot model predictors vs residuals
+par(mfrow = c(2,2))
+x = 0
+for (predictor in overall_model$model){
+  x = x + 1
+  plot(predictor, overall_model$residuals,
+            ylab = "Residuals", xlab = names(overall_model$model)[x], main = names(overall_model$model)[x])
+}
+
+#No multicolinearity
+cor(overall_model$model[,sapply(overall_model$model, is.numeric)])
+
+#normality and autocorrelation of error term
+#plot distribution of error term
+par(mfrow = c(2,2))
+hist(overall_model$residuals, breaks = 40, main = "Distribution of Model Residuals")
+qqPlot(overall_model$residuals, main = "Normality of Model Residuals")
+acf(overall_model$residuals, main = "ACF of Model Residuals")
+pacf(overall_model$residuals)
+par(mfrow = c(1,1))
+shapiro.test(overall_model$residuals)
+```
+
+
