@@ -4,15 +4,16 @@
 ## Data Sets
 
 
-###Inpatient Charge Data by Hospital and DRG, 2011-2014
+###Inpatient Charge Data by Hospital and DRG, 2012-2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/
 
 __Stats:__
-* 681,215 rows
-* 3,446 hospitals
-* 566 services
-* 27,453,280 discharges (avg. 6,863,320 per year)
+* 448,414 rows
+* 3,384 hospitals
+* 100 services (DRGs)
+* 19,181,043 discharges (avg. 6,393,681 per year)
+
 
 __Primary elements:__
 * Hospital identifier, name
@@ -42,7 +43,7 @@ __Primary elements:__
 * Average Medicare payment per discharge (stay)
 
 
-###Medicare Fee-for-Service Enrollment, 2011-2014
+###Medicare Fee-for-Service Enrollment, 2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/CMSProgramStatistics/2013/Enrollment.html#Total (Fee-For-Service and Managed Care) Medicare Enrollment
 
@@ -52,30 +53,41 @@ __Stats:__
 __Primary elements__
 * State
 * Hospital referral region
-* Number of Medicare beneficiaries (Part A and Part B)
+* Number of Medicare beneficiaries (Part A—hospital services)
 
 
-###Provider of Services, 2010-2014
+###Provider of Services, 2014
 _Source: Centers for Medicare & Medicaid Services (CMS)_
 https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Provider-of-Services/index.html
 Note: including 2010 POS file to allow for leading indicators. Hospitals may be responding to market conditions in the prior year to set charges for the current year.
 
 __Stats:__
-* 28,573 rows (avg. 7,143 per year)
+* 136,502 rows (12,286 hospitals)
 
 __Primary elements__
-* Number of times this provider has undergone a change of ownership
-* Facility is eligible to participate in the Medicare and/or Medicaid programs (1/0).
 * Number of affiliated providers
-* Indicates if the hospital has any other affiliated resident program
+* Indication if the provider has any affiliated resident program
+* Indication of change in ownership
 * Number of beds in Medicare and/or Medicaid certified areas within a facility
-* Total number of beds in a hospital, including those in non-participating or non-licensed areas
-* Number of full-time equivalent other personnel employed by a provider
+* Total number of beds, including those in non-participating or non-licensed areas
 * Number of full-time equivalent physicians employed by a provider
 * Number of full-time equivalent licensed practical or vocational nurses employed by a provider
 * Number of full-time equivalent registered nurses employed by a provider
-* Hospital location (city, state, ZIP, CBSA, urban/rural indicator)
-* There are over 180 hospital-level data elements in this file. We will choose a reasonable explanatory subset of these (in addition to those above) prior to analysis.
+* Hospital referral region
+* Urban/rural location
+
+
+###DRG Relative Weights, 2012-2014
+_Source: Centers for Medicare & Medicaid Services (CMS)_
+https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Provider-of-Services/index.html 
+
+__Stats:__
+* ,253 rows (751 DRGs per year)
+
+__Primary elements__
+* Diagnosis-Related Group code
+* Relative weight
+
 
 
 ## History
@@ -102,3 +114,7 @@ __Primary elements__
 * Created master analysis data sets
     - W271_Lab3_Dataset_By_Hosp  (hospital-level rollup of data)
     - W271_Lab3_Dataset_By_Hosp_DRG (at by-hospital-by-DRG level of the original data)
+
+#### 08 Dec 2016:
+
+* Updated statistics for data sets to reflect data used for final modeling.
